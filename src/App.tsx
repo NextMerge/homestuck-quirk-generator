@@ -148,7 +148,7 @@ function App(): JSX.Element {
                     {"Want to check out the source or report issues? See the "}
                     <a
                         href={
-                            "https://github.com/MergeCommits/Homestuck-Quirk-Generator/"
+                            "https://github.com/NextMerge/homestuck-quirk-generator/"
                         }
                     >
                         {"GitHub repo"}

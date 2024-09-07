@@ -2,17 +2,6 @@
     "name": "homestuck-quirk-generator",
     "version": "5.0.0",
     "type": "module",
-    "description": "A site that allows you to convert inputted text into the typing quirk of a Homestuck character.",
-    "repository": {
-        "type": "git",
-        "url": "git+https://MergeCommits@github.com/MergeCommits/Homestuck-Quirk-Generator.git"
-    },
-    "homepage": "https://homestuck-quirks.web.app/",
-    "bugs": {
-        "url": "https://github.com/MergeCommits/Homestuck-Quirk-Generator/issues"
-    },
-    "author": "Mark Jarjour",
-    "license": "SEE LICENSE IN LICENSE.md",
     "private": true,
     "packageManager": "pnpm@9.0.6",
     "scripts": {

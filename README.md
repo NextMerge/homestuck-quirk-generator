@@ -15,6 +15,6 @@ A site that allows you to convert inputted text into the typing quirk of a Homes
 
 Unless otherwise stated, this project is licensed under the zlib license. Please refer to the [LICENSE.md](LICENSE.md) file for more details.
 
-[website-link]: https://homestuck-quirks.web.app/
+[website-link]: https://homestuck-quirks.com/
 [ts]: https://www.typescriptlang.org
 [react]: https://reactjs.org/
