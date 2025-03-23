@@ -8,6 +8,7 @@ import "@fontsource/roboto/700.css";
 import { createTheme, CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { getCurrentThemeOptions } from "theme";
+import { Analytics } from "@vercel/analytics/react";
 
 const root = ReactDOM.createRoot(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -18,6 +19,7 @@ root.render(
         <ThemeProvider theme={createTheme(getCurrentThemeOptions())}>
             <CssBaseline />
             <App />
+            <Analytics />
         </ThemeProvider>
     </StrictMode>
 );
