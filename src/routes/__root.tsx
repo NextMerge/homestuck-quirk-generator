@@ -3,34 +3,35 @@ import {
   Outlet,
   Scripts,
   createRootRoute,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+} from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-import Header from '../components/Header'
+import Header from "../components/Header";
 
-import ClerkProvider from '../integrations/clerk/provider.tsx'
+import ClerkProvider from "../integrations/clerk/provider.tsx";
 
-import ConvexProvider from '../integrations/convex/provider.tsx'
+import ConvexProvider from "../integrations/convex/provider.tsx";
 
-import appCss from '../styles.css?url'
+import { useAuth } from "@clerk/clerk-react";
+import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'TanStack Start Starter',
+        title: "TanStack Start Starter",
       },
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
     ],
@@ -39,7 +40,7 @@ export const Route = createRootRoute({
   component: () => (
     <RootDocument>
       <ClerkProvider>
-        <ConvexProvider>
+        <ConvexProvider useClerkAuth={useAuth}>
           <Header />
 
           <Outlet />
@@ -48,11 +49,11 @@ export const Route = createRootRoute({
       </ClerkProvider>
     </RootDocument>
   ),
-})
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
@@ -61,5 +62,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
