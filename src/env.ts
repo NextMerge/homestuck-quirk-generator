@@ -25,7 +25,9 @@ export const env = createEnv({
   runtimeEnv: {
     CLERK_FRONTEND_API_URL: process.env.CLERK_FRONTEND_API_URL,
     CONVEX_DEPLOYMENT: process.env.CONVEX_DEPLOYMENT,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     VITE_CLERK_PUBLISHABLE_KEY: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     VITE_CONVEX_URL: import.meta.env.VITE_CONVEX_URL,
   },
 
