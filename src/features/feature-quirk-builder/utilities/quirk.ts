@@ -48,7 +48,7 @@ const attributeInformation: Record<
   },
   emoticon: {
     name: "Emoticon",
-    description: "Replace an emote with a replacement",
+    description: "Replace an emoticon with a replacement",
   },
 };
 
@@ -102,9 +102,9 @@ type SuffixAttribute = BaseQuirkAttribute & {
 
 type EmoticonAttribute = BaseQuirkAttribute & {
   type: "emoticon";
-  match: string;
   replacementEyes: string;
-  replacementMouth: string;
+  replacementSmile: string;
+  replacementFrown: string;
 };
 
 type QuirkAttribute =
@@ -286,16 +286,30 @@ export function replaceRegex(params: {
 
 export function replaceEmoticon(params: {
   text: string;
-  match: string;
   replacementEyes: string;
-  replacementMouth: string;
+  replacementSmile: string;
+  replacementFrown: string;
 }) {
   const eyes = "[:;]";
-  const mouth = "[\\)\\(]";
-  const pattern = `(${eyes})(${mouth})`;
-  return params.text.replace(new RegExp(pattern, "gi"), () => {
-    return `${params.replacementEyes}${params.replacementMouth}`;
-  });
+  const smile = "[\\)]";
+  const frown = "[\\(]";
+
+  const replacement = {
+    eyes: params.replacementEyes.length > 0 ? params.replacementEyes : "$1",
+    smile: params.replacementSmile.length > 0 ? params.replacementSmile : "$2",
+    frown: params.replacementFrown.length > 0 ? params.replacementFrown : "$2",
+  };
+
+  return params.text
+    .replace(
+      new RegExp(`(${eyes})(${smile})`, "g"),
+      `${replacement.eyes}${replacement.smile}`,
+    )
+    .replace(
+      new RegExp(`(${eyes})(${frown})`, "g"),
+      `${replacement.eyes}${replacement.frown}`,
+    )
+    .replace(new RegExp(`(${eyes})([dD])`, "g"), `${replacement.eyes}$2`);
 }
 
 export function applyQuirk(params: { quirk: Quirk; text: string }) {
@@ -352,9 +366,9 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
       case "emoticon":
         return replaceEmoticon({
           text: acc,
-          match: attribute.match,
           replacementEyes: attribute.replacementEyes,
-          replacementMouth: attribute.replacementMouth,
+          replacementSmile: attribute.replacementSmile,
+          replacementFrown: attribute.replacementFrown,
         });
     }
   }, params.text);
