@@ -43,7 +43,7 @@ export const Route = createRootRoute({
         <ConvexProvider useClerkAuth={useAuth}>
           <Header />
 
-          <div className="max-w-[1900px]">
+          <div className="mx-auto max-w-[1900px]">
             <Outlet />
           </div>
           <TanStackRouterDevtools />

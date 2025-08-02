@@ -2,9 +2,11 @@ const attributeTypes = [
   "simple",
   "word",
   "wordMatchCase",
+  "matchCase",
   "regex",
   "prefix",
   "suffix",
+  "emoticon",
 ] as const;
 
 const attributeInformation: Record<
@@ -27,6 +29,11 @@ const attributeInformation: Record<
     description:
       "Replace a word with a replacement, matching the case of the original word",
   },
+  matchCase: {
+    name: "Match Case",
+    description:
+      "Replace a character with a replacement, matching the case of the original character",
+  },
   regex: {
     name: "Regex Replace",
     description: "Replace a regex with a replacement",
@@ -38,6 +45,10 @@ const attributeInformation: Record<
   suffix: {
     name: "Suffix",
     description: "Add a suffix to the text",
+  },
+  emoticon: {
+    name: "Emoticon",
+    description: "Replace an emote with a replacement",
   },
 };
 
@@ -66,6 +77,12 @@ type WordReplaceMatchCaseAttribute = BaseQuirkAttribute & {
   replacement: string;
 };
 
+type MatchCaseAttribute = BaseQuirkAttribute & {
+  type: "matchCase";
+  match: string;
+  replacement: string;
+};
+
 type RegexReplaceAttribute = BaseQuirkAttribute & {
   type: "regex";
   match: string;
@@ -83,16 +100,27 @@ type SuffixAttribute = BaseQuirkAttribute & {
   text: string;
 };
 
+type EmoticonAttribute = BaseQuirkAttribute & {
+  type: "emoticon";
+  match: string;
+  replacementEyes: string;
+  replacementMouth: string;
+};
+
 type QuirkAttribute =
   | SimpleReplaceAttribute
   | WordReplaceAttribute
   | WordReplaceMatchCaseAttribute
+  | MatchCaseAttribute
   | RegexReplaceAttribute
   | PrefixAttribute
-  | SuffixAttribute;
+  | SuffixAttribute
+  | EmoticonAttribute;
 
 export type Quirk = {
+  id: string;
   name: string;
+  description?: string;
   color: string;
   attributes: QuirkAttribute[];
 };
@@ -144,6 +172,19 @@ export function replaceWord(params: {
       params.replacement,
     );
   }
+}
+
+export function replaceMatchCase(params: {
+  text: string;
+  char: string;
+  replacement: string;
+}) {
+  return params.text.replace(new RegExp(params.char, "gi"), (match) => {
+    if (match === match.toUpperCase()) {
+      return params.replacement.toUpperCase();
+    }
+    return params.replacement.toLowerCase();
+  });
 }
 
 export function replaceWordMatchCase(params: {
@@ -243,6 +284,20 @@ export function replaceRegex(params: {
   return replaced;
 }
 
+export function replaceEmoticon(params: {
+  text: string;
+  match: string;
+  replacementEyes: string;
+  replacementMouth: string;
+}) {
+  const eyes = "[:;]";
+  const mouth = "[\\)\\(]";
+  const pattern = `(${eyes})(${mouth})`;
+  return params.text.replace(new RegExp(pattern, "gi"), () => {
+    return `${params.replacementEyes}${params.replacementMouth}`;
+  });
+}
+
 export function applyQuirk(params: { quirk: Quirk; text: string }) {
   return params.quirk.attributes.reduce((acc, attribute) => {
     if (attribute.probability && Math.random() > attribute.probability) {
@@ -277,6 +332,12 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
           word: attribute.match,
           replacement: attribute.replacement,
         });
+      case "matchCase":
+        return replaceMatchCase({
+          text: acc,
+          char: attribute.match,
+          replacement: attribute.replacement,
+        });
       case "regex":
         return replaceRegex({
           text: acc,
@@ -288,6 +349,13 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
         return `${attribute.text}${acc}`;
       case "suffix":
         return `${acc}${attribute.text}`;
+      case "emoticon":
+        return replaceEmoticon({
+          text: acc,
+          match: attribute.match,
+          replacementEyes: attribute.replacementEyes,
+          replacementMouth: attribute.replacementMouth,
+        });
     }
   }, params.text);
 }

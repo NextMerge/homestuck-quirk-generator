@@ -11,17 +11,8 @@ body {
     "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(
-    135deg,
-    #0a1a1a 0%,
-    #0f2626 20%,
-    #134040 35%,
-    #1a4d4d 50%,
-    #134040 65%,
-    #0f2626 80%,
-    #0a1a1a 100%
-  );
-  background-color: #0a1a1a;
+  background: #0f1419;
+  background-color: #0f1419;
   background-attachment: fixed;
   min-height: 100svh;
 }
