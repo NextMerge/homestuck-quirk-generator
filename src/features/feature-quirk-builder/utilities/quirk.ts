@@ -265,20 +265,38 @@ export function replaceRegex(params: {
     .replace(/upper\((.*?)\)/g, (_: string, p1: string) => p1.toUpperCase())
     .replace(/lower\((.*?)\)/g, (_: string, p1: string) => p1.toLowerCase())
     .replace(/oddCase\((.*?)\)/g, (_: string, p1: string) => {
-      const words = p1.split(" ");
-      return words
-        .map((word, index) =>
-          index % 2 === 0 ? word.toUpperCase() : word.toLowerCase(),
-        )
-        .join(" ");
+      let letterIndex = 0;
+      return p1
+        .split("")
+        .map((char) => {
+          // Only alternate case for letters
+          if (/[a-zA-Z]/.test(char)) {
+            const result =
+              letterIndex % 2 === 0 ? char.toLowerCase() : char.toUpperCase();
+            letterIndex++;
+            return result;
+          }
+          // Preserve non-letters as-is
+          return char;
+        })
+        .join("");
     })
     .replace(/evenCase\((.*?)\)/g, (_: string, p1: string) => {
-      const words = p1.split(" ");
-      return words
-        .map((word, index) =>
-          index % 2 === 0 ? word.toLowerCase() : word.toUpperCase(),
-        )
-        .join(" ");
+      let letterIndex = 0;
+      return p1
+        .split("")
+        .map((char) => {
+          // Only alternate case for letters
+          if (/[a-zA-Z]/.test(char)) {
+            const result =
+              letterIndex % 2 === 0 ? char.toUpperCase() : char.toLowerCase();
+            letterIndex++;
+            return result;
+          }
+          // Preserve non-letters as-is
+          return char;
+        })
+        .join("");
     });
 
   return replaced;
