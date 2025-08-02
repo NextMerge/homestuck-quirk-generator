@@ -32,8 +32,8 @@ export function QuirkTable({ quirks }: QuirkTableProps) {
       {quirks.map((quirk, index) => {
         const quirkedText = applyQuirk({ quirk, text: inputText });
         return (
-          <>
-            <div key={quirk.id} className="flex items-center gap-8 p-2">
+          <div key={quirk.id}>
+            <div className="flex items-center gap-8 p-2">
               <div className="flex items-center gap-2">
                 <div
                   className="h-3 w-3 rounded-full border"
@@ -42,7 +42,9 @@ export function QuirkTable({ quirks }: QuirkTableProps) {
                 {quirk.name}
               </div>
               <div className="flex-1 font-mono break-words">
-                <span style={{ color: quirk.color }}>{quirkedText}</span>
+                <span style={{ color: quirk.color }} suppressHydrationWarning>
+                  {quirkedText}
+                </span>
               </div>
               <Button
                 variant="ghost"
@@ -62,7 +64,7 @@ export function QuirkTable({ quirks }: QuirkTableProps) {
             {index < quirks.length - 1 && (
               <Separator orientation="horizontal" />
             )}
-          </>
+          </div>
         );
       })}
     </Tile>

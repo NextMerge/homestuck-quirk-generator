@@ -4,6 +4,8 @@ import { catPuns } from "./catPuns";
 export const aradiaColor = "#A10000";
 export const tavrosColor = "#A15000";
 export const solluxColor = "#A1A100";
+export const kanayaColor = "#008141";
+export const tereziColor = "#008282";
 
 export const alterniaQuirks: Quirk[] = [
   {
@@ -55,9 +57,9 @@ export const alterniaQuirks: Quirk[] = [
       },
       {
         type: "emoticon",
-        match: "[:;]",
-        replacementEyes: ":",
-        replacementMouth: ")",
+        replacementEyes: "}$1",
+        replacementSmile: "",
+        replacementFrown: "",
       },
     ],
   },
@@ -125,6 +127,56 @@ export const alterniaQuirks: Quirk[] = [
       {
         type: "prefix",
         text: ":33 < ",
+      },
+    ],
+  },
+  {
+    id: "kanaya-maryam",
+    name: "Kanaya Maryam",
+    color: kanayaColor,
+    attributes: [
+      {
+        type: "regex",
+        match: "^(\\W*)(\\w)",
+        replacement: "$1upper($2)",
+      },
+      {
+        type: "regex",
+        match: "(\\s|\\s\\W)([a-zA-Z])",
+        replacement: "$1upper($2)",
+      },
+    ],
+  },
+  {
+    id: "terezi-pyrope",
+    name: "Terezi Pyrope",
+    color: tereziColor,
+    attributes: [
+      {
+        type: "regex",
+        match: "(.*)",
+        replacement: "upper($1)",
+      },
+      {
+        type: "simple",
+        match: "A",
+        replacement: "4",
+      },
+      {
+        type: "simple",
+        match: "I",
+        replacement: "1",
+      },
+      {
+        type: "simple",
+        match: "E",
+        replacement: "3",
+      },
+      {
+        type: "emoticon",
+        replacementEyes: ">$1",
+        replacementSmile: "]",
+        replacementFrown: "[",
       },
     ],
   },
