@@ -10,7 +10,7 @@ export function Tile({ children, className }: TileProps) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-white/10 bg-white/5 shadow-2xl",
+        "rounded-xl border border-white/20 bg-white/10 shadow-2xl shadow-black/20 backdrop-blur-sm",
         className,
       )}
     >

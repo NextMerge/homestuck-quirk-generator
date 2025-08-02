@@ -9,13 +9,13 @@ export const alterniaQuirks: Quirk[] = [
     attributes: [
       {
         type: "regex",
-        match: ".*",
+        match: "(.*)",
         replacement: "lower($1)",
       },
       {
         type: "simple",
         match: "o",
-        replacement: "o",
+        replacement: "0",
       },
       {
         type: "suffix",
