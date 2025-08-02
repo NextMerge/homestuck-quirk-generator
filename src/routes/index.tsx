@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
 function App() {
   return (
     <QuirkProvider>
-      <main className="container mx-auto space-y-6 p-6">
+      <main className="space-y-6 p-6">
         <CanonQuirksHeader />
         <QuirkTable quirks={alterniaQuirks} />
       </main>

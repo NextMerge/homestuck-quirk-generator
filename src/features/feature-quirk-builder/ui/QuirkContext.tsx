@@ -19,7 +19,7 @@ type QuirkProviderProps = {
   children: ReactNode;
 };
 
-export const phrase = "The quick brown fox jumps over the lazy dog. :)";
+export const phrase = "The quick brown fox jumps over the lazy dog.";
 
 export function QuirkProvider({ children }: QuirkProviderProps) {
   const [inputText, setInputText] = useState<string>(phrase);
