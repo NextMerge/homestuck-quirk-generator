@@ -42,7 +42,11 @@ export function QuirkTable({ quirks }: QuirkTableProps) {
                 {quirk.name}
               </div>
               <div className="flex-1 font-mono break-words">
-                <span style={{ color: quirk.color }} suppressHydrationWarning>
+                <span
+                  className="whitespace-pre-wrap"
+                  style={{ color: quirk.color }}
+                  suppressHydrationWarning
+                >
                   {quirkedText}
                 </span>
               </div>

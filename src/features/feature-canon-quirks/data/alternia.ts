@@ -1,11 +1,16 @@
 import type { Quirk } from "@/features/feature-quirk-builder/utilities/quirk";
 import { catPuns } from "./catPuns";
+import { fishPuns } from "./fishPuns";
 
 export const aradiaColor = "#A10000";
 export const tavrosColor = "#A15000";
 export const solluxColor = "#A1A100";
 export const kanayaColor = "#008141";
 export const tereziColor = "#008282";
+export const vriskaColor = "#005682";
+export const equiusColor = "#3030B9";
+export const gamzeeColor = "#5700B0";
+export const eridanColor = "#6A006A";
 
 export const alterniaQuirks: Quirk[] = [
   {
@@ -177,6 +182,135 @@ export const alterniaQuirks: Quirk[] = [
         replacementEyes: ">$1",
         replacementSmile: "]",
         replacementFrown: "[",
+      },
+    ],
+  },
+  {
+    id: "vriska-serket",
+    name: "Vriska Serket",
+    color: vriskaColor,
+    attributes: [
+      {
+        type: "simple",
+        match: "b",
+        replacement: "8",
+      },
+      {
+        type: "simple",
+        match: "ate",
+        replacement: "8",
+      },
+      {
+        type: "simple",
+        match: "ait",
+        replacement: "8",
+      },
+      {
+        type: "wordMatchCase",
+        match: "great",
+        replacement: "gr8",
+      },
+      {
+        type: "emoticon",
+        replacementEyes: ":::$1",
+        replacementSmile: "",
+        replacementFrown: "",
+      },
+    ],
+  },
+  {
+    id: "equius-zahhak",
+    name: "Equius Zahhak",
+    color: equiusColor,
+    attributes: [
+      {
+        type: "simple",
+        match: "x",
+        replacement: "%",
+      },
+      {
+        type: "matchCase",
+        match: "nay",
+        replacement: "neigh",
+      },
+      {
+        type: "simple",
+        match: "loo",
+        replacement: "100",
+      },
+      {
+        type: "simple",
+        match: "strong",
+        replacement: "STRONG",
+      },
+      {
+        type: "prefix",
+        text: "D --> ",
+      },
+    ],
+  },
+  {
+    id: "gamzee-makara",
+    name: "Gamzee Makara",
+    color: gamzeeColor,
+    attributes: [
+      {
+        type: "regex",
+        match: "(.*)",
+        replacement: "oddCase($1)",
+      },
+      {
+        type: "emoticon",
+        replacementEyes: "$1o",
+        replacementSmile: "",
+        replacementFrown: "",
+      },
+    ],
+  },
+  {
+    id: "eridan-ampora",
+    name: "Eridan Ampora",
+    color: eridanColor,
+    attributes: [
+      {
+        type: "regex",
+        match: "(.*)",
+        replacement: "lower($1)",
+      },
+      {
+        type: "simple",
+        match: "w",
+        replacement: "ww",
+      },
+      {
+        type: "simple",
+        match: "v",
+        replacement: "vv",
+      },
+    ],
+  },
+  {
+    id: "feferi-peixes",
+    name: "Feferi Peixes",
+    color: "#77003C",
+    attributes: [
+      ...fishPuns,
+      {
+        type: "simple",
+        match: "h",
+        replacement: ")(",
+      },
+      {
+        type: "simple",
+        match: "E",
+        replacement: "-E",
+        caseSensitive: true,
+      },
+      {
+        type: "emoticon",
+        replacementEyes: "38",
+        replacementSmile: "",
+        replacementFrown: "",
       },
     ],
   },
