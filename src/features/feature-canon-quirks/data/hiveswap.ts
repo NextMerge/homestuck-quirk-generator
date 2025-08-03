@@ -6,6 +6,8 @@ const skyllaColor = "#A25200";
 const bronyaColor = "#008342";
 const tagoraColor = "#008484";
 const polypaColor = "#426800";
+const folyklColor = "#A2A200";
+const chahutColor = "#5C0089";
 
 export const hiveswapQuirks: Quirk[] = [
   {
@@ -223,6 +225,237 @@ export const hiveswapQuirks: Quirk[] = [
         type: "simple",
         match: "l",
         replacement: "L",
+      },
+    ],
+  },
+  {
+    id: "kuprum-maxlol",
+    name: "Kuprum Maxlol",
+    color: "#A2A200",
+    attributes: [
+      lowerCaseAll,
+      {
+        type: "regex",
+        match: "(\\bl+o[ol]*l\\b)",
+        replacement: "upper($1)",
+      },
+      {
+        type: "prefix",
+        text: ">",
+      },
+    ],
+  },
+  {
+    id: "folykl-darane",
+    name: "Folykl Darane",
+    color: folyklColor,
+    attributes: [
+      {
+        type: "random",
+        match: "\\b\\s\\b",
+        replacements: ["  ", "   ", "    "],
+        probability: 0.1,
+      },
+    ],
+  },
+  {
+    id: "remele-namaaq",
+    name: "Remele Namaaq",
+    color: vriskaColor,
+    attributes: [
+      {
+        type: "random",
+        match: "(\\w+)",
+        replacements: ["$1e"],
+        probability: 0.5,
+      },
+    ],
+  },
+  {
+    id: "tyzias-entykk",
+    name: "Tyzias Entykk",
+    color: tagoraColor,
+    attributes: [
+      lowerCaseAll,
+      {
+        type: "simple",
+        match: "m",
+        replacement: "mmmm",
+      },
+      {
+        type: "simple",
+        match: "w",
+        replacement: "wwww",
+      },
+    ],
+  },
+  {
+    id: "chixie-roixmr",
+    name: "Chixie Roixmr",
+    color: skyllaColor,
+    attributes: [
+      lowerCaseAll,
+      {
+        type: "regex",
+        match: "\\s[\\.,]|[\\.,]",
+        replacement: " /",
+      },
+    ],
+  },
+  {
+    id: "azdaja-knelax",
+    name: "Azdaja Knelax",
+    color: folyklColor,
+    attributes: [
+      {
+        type: "prefix",
+        text: "||| ",
+      },
+      {
+        type: "suffix",
+        text: " |||",
+      },
+    ],
+  },
+  {
+    id: "chahut-maenad",
+    name: "Chahut Maenad",
+    color: chahutColor,
+    attributes: [
+      lowerCaseAll,
+      {
+        type: "simple",
+        match: "t",
+        replacement: "T",
+      },
+    ],
+  },
+  {
+    id: "zebede-tongva",
+    name: "Zebede Tongva",
+    color: folyklColor,
+    attributes: [
+      lowerCaseAll,
+      {
+        type: "regex",
+        match: "s\\b",
+        replacement: "z",
+      },
+      {
+        type: "emoticon",
+        replacementEyes: "z$1",
+        replacementSmile: "",
+        replacementFrown: "",
+      },
+    ],
+  },
+  {
+    id: "tegiri-kalbur",
+    name: "Tegiri Kalbur",
+    color: tagoraColor,
+    attributes: [
+      {
+        type: "simple",
+        match: "l",
+        replacement: "/",
+      },
+    ],
+  },
+  {
+    id: "mallek-adalov",
+    name: "Mallek Adalov",
+    color: vriskaColor,
+    attributes: [
+      lowerCaseAll,
+      {
+        type: "simple",
+        match: ".",
+        replacement: ";",
+      },
+      {
+        type: "word",
+        match: "is not",
+        replacement: "!=",
+      },
+      {
+        type: "word",
+        match: "is",
+        replacement: "=",
+      },
+    ],
+  },
+  {
+    id: "lyner-skalbi",
+    name: "Lynera Skalbi",
+    color: bronyaColor,
+    attributes: [
+      {
+        type: "prefix",
+        text: "-",
+      },
+    ],
+  },
+  {
+    id: "tirona-kasund",
+    name: "Tirona Kasund",
+    color: tagoraColor,
+    attributes: [
+      {
+        type: "simple",
+        match: "e",
+        replacement: "33",
+      },
+      {
+        type: "emoticon",
+        replacementEyes: "33$1",
+        replacementSmile: "",
+        replacementFrown: "",
+      },
+    ],
+  },
+  {
+    id: "boldir-lamati",
+    name: "Boldir Lamati",
+    color: polypaColor,
+    attributes: [
+      lowerCaseAll,
+      {
+        type: "prefix",
+        text: "(",
+      },
+      {
+        type: "suffix",
+        text: ")",
+      },
+    ],
+  },
+  {
+    id: "marsti-houtek",
+    name: "Marsti Houtek",
+    color: diemenColor,
+    attributes: [
+      {
+        type: "suffix",
+        text: " -_-",
+      },
+    ],
+  },
+  {
+    id: "karako-pierot",
+    name: "Karako Pierot",
+    color: chahutColor,
+    attributes: [
+      {
+        type: "regex",
+        match: "[A-Z]+",
+        replacement: "HONK",
+        caseSensitive: true,
+      },
+      {
+        type: "regex",
+        match: "[a-z]+",
+        replacement: "honk",
+        caseSensitive: true,
       },
     ],
   },
