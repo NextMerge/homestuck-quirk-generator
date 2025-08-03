@@ -1,5 +1,8 @@
 import { alterniaQuirks } from "@/features/feature-canon-quirks/data/alternia";
 import { beforusQuirks } from "@/features/feature-canon-quirks/data/beforus";
+import { cherubsQuirks } from "@/features/feature-canon-quirks/data/cherubs";
+import { hiveswapQuirks } from "@/features/feature-canon-quirks/data/hiveswap";
+import { spritesQuirks } from "@/features/feature-canon-quirks/data/sprites";
 import {
   CanonQuirksHeader,
   type PresetType,
@@ -18,11 +21,30 @@ function App() {
 
   const quirks = useMemo(() => {
     if (selectedPreset === "All") {
-      return [...alterniaQuirks, ...beforusQuirks];
+      return [
+        ...alterniaQuirks,
+        ...beforusQuirks,
+        ...cherubsQuirks,
+        ...spritesQuirks,
+        ...hiveswapQuirks,
+      ];
     }
     if (selectedPreset === "Beforus") {
       return beforusQuirks;
     }
+
+    if (selectedPreset === "Cherubs") {
+      return cherubsQuirks;
+    }
+
+    if (selectedPreset === "Sprites") {
+      return spritesQuirks;
+    }
+
+    if (selectedPreset === "Hiveswap") {
+      return hiveswapQuirks;
+    }
+
     return alterniaQuirks;
   }, [selectedPreset]);
 
