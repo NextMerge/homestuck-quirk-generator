@@ -256,12 +256,16 @@ export function replaceRegex(params: {
   replacement: string;
   caseSensitive: boolean;
 }) {
-  let replaced = params.text.replace(
-    new RegExp(params.regex, params.caseSensitive ? "g" : "gi"),
-    params.replacement,
-  );
+  const tempLeftParenthesis = "<<<";
+  const tempRightParenthesis = ">>>";
 
-  replaced = replaced
+  return params.text
+    .replace(new RegExp("\\(", "g"), tempLeftParenthesis)
+    .replace(new RegExp("\\)", "g"), tempRightParenthesis)
+    .replace(
+      new RegExp(params.regex, params.caseSensitive ? "g" : "gi"),
+      params.replacement,
+    )
     .replace(/upper\((.*?)\)/g, (_: string, p1: string) => p1.toUpperCase())
     .replace(/lower\((.*?)\)/g, (_: string, p1: string) => p1.toLowerCase())
     .replace(/oddCase\((.*?)\)/g, (_: string, p1: string) => {
@@ -297,9 +301,9 @@ export function replaceRegex(params: {
           return char;
         })
         .join("");
-    });
-
-  return replaced;
+    })
+    .replace(new RegExp(tempLeftParenthesis, "gi"), "(")
+    .replace(new RegExp(tempRightParenthesis, "gi"), ")");
 }
 
 export function replaceEmoticon(params: {

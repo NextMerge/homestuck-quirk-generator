@@ -6,11 +6,24 @@ export const aradiaColor = "#A10000";
 export const tavrosColor = "#A15000";
 export const solluxColor = "#A1A100";
 export const kanayaColor = "#008141";
+export const nepetaColor = "#416600";
 export const tereziColor = "#008282";
 export const vriskaColor = "#005682";
 export const equiusColor = "#3030B9";
 export const gamzeeColor = "#5700B0";
 export const eridanColor = "#6A006A";
+
+export const upperCaseAll = {
+  type: "regex",
+  match: "(.*)",
+  replacement: "upper($1)",
+} as const;
+
+export const lowerCaseAll = {
+  type: "regex",
+  match: "(.*)",
+  replacement: "lower($1)",
+} as const;
 
 export const alterniaQuirks: Quirk[] = [
   {
@@ -18,11 +31,7 @@ export const alterniaQuirks: Quirk[] = [
     name: "Aradia Megido",
     color: aradiaColor,
     attributes: [
-      {
-        type: "regex",
-        match: "(.*)",
-        replacement: "lower($1)",
-      },
+      lowerCaseAll,
       {
         type: "simple",
         match: "o",
@@ -40,11 +49,7 @@ export const alterniaQuirks: Quirk[] = [
     name: "Tavros Nitram",
     color: tavrosColor,
     attributes: [
-      {
-        type: "regex",
-        match: "(.*)",
-        replacement: "upper($1)",
-      },
+      upperCaseAll,
       {
         type: "simple",
         match: ".",
@@ -73,11 +78,7 @@ export const alterniaQuirks: Quirk[] = [
     name: "Sollux Captor",
     color: solluxColor,
     attributes: [
-      {
-        type: "regex",
-        match: "(.*)",
-        replacement: "lower($1)",
-      },
+      lowerCaseAll,
       {
         type: "simple",
         match: "i",
@@ -100,24 +101,14 @@ export const alterniaQuirks: Quirk[] = [
     id: "karkat-vantas",
     name: "Karkat Vantas",
     color: "#626262",
-    attributes: [
-      {
-        type: "regex",
-        match: "(.*)",
-        replacement: "upper($1)",
-      },
-    ],
+    attributes: [upperCaseAll],
   },
   {
     id: "nepeta-leijon",
     name: "Nepeta Leijon",
-    color: "#416600",
+    color: nepetaColor,
     attributes: [
-      {
-        type: "regex",
-        match: "(.*)",
-        replacement: "lower($1)",
-      },
+      lowerCaseAll,
       {
         type: "simple",
         match: "ee",
@@ -157,11 +148,7 @@ export const alterniaQuirks: Quirk[] = [
     name: "Terezi Pyrope",
     color: tereziColor,
     attributes: [
-      {
-        type: "regex",
-        match: "(.*)",
-        replacement: "upper($1)",
-      },
+      upperCaseAll,
       {
         type: "simple",
         match: "A",
@@ -272,11 +259,7 @@ export const alterniaQuirks: Quirk[] = [
     name: "Eridan Ampora",
     color: eridanColor,
     attributes: [
-      {
-        type: "regex",
-        match: "(.*)",
-        replacement: "lower($1)",
-      },
+      lowerCaseAll,
       {
         type: "simple",
         match: "w",
