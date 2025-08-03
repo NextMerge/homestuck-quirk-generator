@@ -459,4 +459,98 @@ export const hiveswapQuirks: Quirk[] = [
       },
     ],
   },
+  {
+    id: "wanshi-adyata",
+    name: "Wanshi Adyata",
+    color: bronyaColor,
+    attributes: [
+      {
+        type: "simple",
+        match: "w",
+        replacement: "W",
+      },
+      {
+        type: "prefix",
+        text: "[]",
+      },
+      {
+        type: "suffix",
+        text: "[]",
+      },
+    ],
+  },
+  {
+    id: "fozzer-velyes",
+    name: "Fozzer Velyes",
+    color: diemenColor,
+    attributes: [
+      {
+        type: "regex",
+        match: "\\s",
+        replacement: "_",
+      },
+    ],
+  },
+  {
+    id: "daraya-jonjet",
+    name: "Daraya Jonjet",
+    description:
+      "Add an '!' to the start of the input text to triple the amount of triangles for emphasis.",
+    color: bronyaColor,
+    attributes: [
+      {
+        type: "suffix",
+        condition: "^!",
+        text: "▼▼▼",
+      },
+      {
+        type: "prefix",
+        condition: "^!",
+        text: "▲▲▲",
+      },
+      {
+        type: "suffix",
+        condition: "^[^▲]",
+        text: "▼",
+      },
+      {
+        type: "prefix",
+        condition: "^[^▲]",
+        text: "▲",
+      },
+      {
+        type: "regex",
+        match: "^▲▲▲!",
+        replacement: "▲▲▲",
+      },
+    ],
+  },
+  {
+    id: "nihkee-moolah",
+    name: "Nihkee Moolah",
+    color: equiusColor,
+    attributes: [
+      {
+        type: "prefix",
+        text: "[()] ",
+      },
+    ],
+  },
+  {
+    id: "lanque-bombyx",
+    name: "Lanque Bombyx",
+    color: bronyaColor,
+    attributes: [
+      {
+        type: "simple",
+        match: "w",
+        replacement: "W",
+      },
+      {
+        type: "simple",
+        match: "v",
+        replacement: "V",
+      },
+    ],
+  },
 ];
