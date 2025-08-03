@@ -10,7 +10,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useQuirkContext } from "../../feature-quirk-builder/ui/QuirkContext";
 
-export type PresetType = "All" | "Alternia" | "Beforus";
+export type PresetType =
+  | "All"
+  | "Alternia"
+  | "Beforus"
+  | "Cherubs"
+  | "Sprites"
+  | "Hiveswap";
 
 type CanonQuirksHeaderProps = {
   selectedPreset: PresetType;
@@ -43,6 +49,9 @@ export function CanonQuirksHeader({
                 <SelectItem value="All">All</SelectItem>
                 <SelectItem value="Alternia">Alternia</SelectItem>
                 <SelectItem value="Beforus">Beforus</SelectItem>
+                <SelectItem value="Cherubs">Cherubs</SelectItem>
+                <SelectItem value="Sprites">Sprites</SelectItem>
+                <SelectItem value="Hiveswap">Hiveswap</SelectItem>
               </SelectContent>
             </Select>
           </div>
