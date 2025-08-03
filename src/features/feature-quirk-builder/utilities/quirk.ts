@@ -7,6 +7,7 @@ const attributeTypes = [
   "prefix",
   "suffix",
   "emoticon",
+  "random",
 ] as const;
 
 const attributeInformation: Record<
@@ -50,6 +51,10 @@ const attributeInformation: Record<
     name: "Emoticon",
     description: "Replace an emoticon with a replacement",
   },
+  random: {
+    name: "Random",
+    description: "Randomly replace a character with a replacement",
+  },
 };
 
 type BaseQuirkAttribute = {
@@ -87,6 +92,7 @@ type RegexReplaceAttribute = BaseQuirkAttribute & {
   type: "regex";
   match: string;
   replacement: string;
+  applyProbabilityToEachMatch?: boolean;
   caseSensitive?: boolean;
 };
 
@@ -107,6 +113,13 @@ type EmoticonAttribute = BaseQuirkAttribute & {
   replacementFrown: string;
 };
 
+type RandomAttribute = BaseQuirkAttribute & {
+  type: "random";
+  match: string;
+  replacements: string[];
+  caseSensitive?: boolean;
+};
+
 type QuirkAttribute =
   | SimpleReplaceAttribute
   | WordReplaceAttribute
@@ -115,7 +128,8 @@ type QuirkAttribute =
   | RegexReplaceAttribute
   | PrefixAttribute
   | SuffixAttribute
-  | EmoticonAttribute;
+  | EmoticonAttribute
+  | RandomAttribute;
 
 export type Quirk = {
   id: string;
@@ -255,9 +269,11 @@ export function replaceRegex(params: {
   regex: string;
   replacement: string;
   caseSensitive: boolean;
+  probability: number;
+  applyProbabilityToEachMatch: boolean;
 }) {
-  const tempLeftParenthesis = "<<<";
-  const tempRightParenthesis = ">>>";
+  const tempLeftParenthesis = "“";
+  const tempRightParenthesis = "”";
 
   return params.text
     .replace(new RegExp("\\(", "g"), tempLeftParenthesis)
@@ -334,9 +350,35 @@ export function replaceEmoticon(params: {
     .replace(new RegExp(`(${eyes})([dD])`, "g"), `${replacement.eyes}$2`);
 }
 
+function replaceRandom(params: {
+  text: string;
+  match: string;
+  replacements: string[];
+  caseSensitive: boolean;
+  probability: number;
+}) {
+  return params.text.replace(
+    new RegExp(params.match, params.caseSensitive ? "g" : "gi"),
+    (match) => {
+      const mathRandom = Math.random();
+      if (mathRandom > params.probability) {
+        return match;
+      }
+      return params.replacements[
+        Math.floor(mathRandom * params.replacements.length)
+      ].replace("$1", match);
+    },
+  );
+}
+
 export function applyQuirk(params: { quirk: Quirk; text: string }) {
   return params.quirk.attributes.reduce((acc, attribute) => {
-    if (attribute.probability && Math.random() > attribute.probability) {
+    const mathRandom = Math.random();
+    if (
+      attribute.probability &&
+      attribute.type !== "random" &&
+      mathRandom > attribute.probability
+    ) {
       return acc;
     }
 
@@ -377,6 +419,9 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
           regex: attribute.match,
           replacement: attribute.replacement,
           caseSensitive: attribute.caseSensitive ?? false,
+          probability: attribute.probability ?? 1,
+          applyProbabilityToEachMatch:
+            attribute.applyProbabilityToEachMatch ?? false,
         });
       case "prefix":
         return `${attribute.text}${acc}`;
@@ -388,6 +433,14 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
           replacementEyes: attribute.replacementEyes,
           replacementSmile: attribute.replacementSmile,
           replacementFrown: attribute.replacementFrown,
+        });
+      case "random":
+        return replaceRandom({
+          text: acc,
+          match: attribute.match,
+          replacements: attribute.replacements,
+          caseSensitive: attribute.caseSensitive ?? false,
+          probability: attribute.probability ?? 1,
         });
     }
   }, params.text);
