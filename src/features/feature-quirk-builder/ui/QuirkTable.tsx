@@ -34,7 +34,7 @@ export function QuirkTable({ quirks }: QuirkTableProps) {
         return (
           <div key={quirk.id}>
             <div className="flex items-center gap-8 p-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm md:min-w-[130px]">
                 <div
                   className="h-3 w-3 rounded-full border"
                   style={{ backgroundColor: quirk.color }}

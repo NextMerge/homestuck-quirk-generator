@@ -213,4 +213,17 @@ export const hiveswapQuirks: Quirk[] = [
       },
     ],
   },
+  {
+    id: "elwurd",
+    name: "Elwurd",
+    color: vriskaColor,
+    attributes: [
+      lowerCaseAll,
+      {
+        type: "simple",
+        match: "l",
+        replacement: "L",
+      },
+    ],
+  },
 ];
