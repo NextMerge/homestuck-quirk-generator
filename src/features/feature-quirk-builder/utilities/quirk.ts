@@ -53,7 +53,7 @@ const attributeInformation: Record<
 };
 
 type BaseQuirkAttribute = {
-  conditionRegex?: string;
+  condition?: string;
   probability?: number;
 };
 
@@ -340,10 +340,7 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
       return acc;
     }
 
-    if (
-      attribute.conditionRegex &&
-      !new RegExp(attribute.conditionRegex).test(acc)
-    ) {
+    if (attribute.condition && !new RegExp(attribute.condition).test(acc)) {
       return acc;
     }
 
