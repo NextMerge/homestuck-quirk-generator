@@ -8,259 +8,259 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createServerRootRoute } from "@tanstack/react-start/server";
+import { createServerRootRoute } from '@tanstack/react-start/server'
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as AuthedRouteImport } from "./routes/_authed";
-import { Route as AuthedDashboardRouteImport } from "./routes/_authed/dashboard";
-import { ServerRoute as ApiDemoNamesServerRouteImport } from "./routes/api.demo-names";
-import { Route as DemoClerkRouteImport } from "./routes/demo.clerk";
-import { Route as DemoConvexRouteImport } from "./routes/demo.convex";
-import { Route as DemoFormAddressRouteImport } from "./routes/demo.form.address";
-import { Route as DemoFormSimpleRouteImport } from "./routes/demo.form.simple";
-import { Route as DemoStartApiRequestRouteImport } from "./routes/demo.start.api-request";
-import { Route as DemoStartServerFuncsRouteImport } from "./routes/demo.start.server-funcs";
-import { Route as IndexRouteImport } from "./routes/index";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as DemoConvexRouteImport } from './routes/demo.convex'
+import { Route as DemoClerkRouteImport } from './routes/demo.clerk'
+import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
+import { Route as DemoStartApiRequestRouteImport } from './routes/demo.start.api-request'
+import { Route as DemoFormSimpleRouteImport } from './routes/demo.form.simple'
+import { Route as DemoFormAddressRouteImport } from './routes/demo.form.address'
+import { ServerRoute as ApiDemoNamesServerRouteImport } from './routes/api.demo-names'
 
-const rootServerRouteImport = createServerRootRoute();
+const rootServerRouteImport = createServerRootRoute()
 
 const AuthedRoute = AuthedRouteImport.update({
-  id: "/_authed",
+  id: '/_authed',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoConvexRoute = DemoConvexRouteImport.update({
-  id: "/demo/convex",
-  path: "/demo/convex",
+  id: '/demo/convex',
+  path: '/demo/convex',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoClerkRoute = DemoClerkRouteImport.update({
-  id: "/demo/clerk",
-  path: "/demo/clerk",
+  id: '/demo/clerk',
+  path: '/demo/clerk',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthedRoute,
-} as any);
+} as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
-  id: "/demo/start/server-funcs",
-  path: "/demo/start/server-funcs",
+  id: '/demo/start/server-funcs',
+  path: '/demo/start/server-funcs',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
-  id: "/demo/start/api-request",
-  path: "/demo/start/api-request",
+  id: '/demo/start/api-request',
+  path: '/demo/start/api-request',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
-  id: "/demo/form/simple",
-  path: "/demo/form/simple",
+  id: '/demo/form/simple',
+  path: '/demo/form/simple',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
-  id: "/demo/form/address",
-  path: "/demo/form/address",
+  id: '/demo/form/address',
+  path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApiDemoNamesServerRoute = ApiDemoNamesServerRouteImport.update({
-  id: "/api/demo-names",
-  path: "/api/demo-names",
+  id: '/api/demo-names',
+  path: '/api/demo-names',
   getParentRoute: () => rootServerRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/dashboard": typeof AuthedDashboardRoute;
-  "/demo/clerk": typeof DemoClerkRoute;
-  "/demo/convex": typeof DemoConvexRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
-  "/demo/start/api-request": typeof DemoStartApiRequestRoute;
-  "/demo/start/server-funcs": typeof DemoStartServerFuncsRoute;
+  '/': typeof IndexRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/demo/clerk': typeof DemoClerkRoute
+  '/demo/convex': typeof DemoConvexRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/dashboard": typeof AuthedDashboardRoute;
-  "/demo/clerk": typeof DemoClerkRoute;
-  "/demo/convex": typeof DemoConvexRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
-  "/demo/start/api-request": typeof DemoStartApiRequestRoute;
-  "/demo/start/server-funcs": typeof DemoStartServerFuncsRoute;
+  '/': typeof IndexRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/demo/clerk': typeof DemoClerkRoute
+  '/demo/convex': typeof DemoConvexRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/_authed": typeof AuthedRouteWithChildren;
-  "/_authed/dashboard": typeof AuthedDashboardRoute;
-  "/demo/clerk": typeof DemoClerkRoute;
-  "/demo/convex": typeof DemoConvexRoute;
-  "/demo/form/address": typeof DemoFormAddressRoute;
-  "/demo/form/simple": typeof DemoFormSimpleRoute;
-  "/demo/start/api-request": typeof DemoStartApiRequestRoute;
-  "/demo/start/server-funcs": typeof DemoStartServerFuncsRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
+  '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/demo/clerk': typeof DemoClerkRoute
+  '/demo/convex': typeof DemoConvexRoute
+  '/demo/form/address': typeof DemoFormAddressRoute
+  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/demo/start/api-request': typeof DemoStartApiRequestRoute
+  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/dashboard"
-    | "/demo/clerk"
-    | "/demo/convex"
-    | "/demo/form/address"
-    | "/demo/form/simple"
-    | "/demo/start/api-request"
-    | "/demo/start/server-funcs";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/dashboard'
+    | '/demo/clerk'
+    | '/demo/convex'
+    | '/demo/form/address'
+    | '/demo/form/simple'
+    | '/demo/start/api-request'
+    | '/demo/start/server-funcs'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/dashboard"
-    | "/demo/clerk"
-    | "/demo/convex"
-    | "/demo/form/address"
-    | "/demo/form/simple"
-    | "/demo/start/api-request"
-    | "/demo/start/server-funcs";
+    | '/'
+    | '/dashboard'
+    | '/demo/clerk'
+    | '/demo/convex'
+    | '/demo/form/address'
+    | '/demo/form/simple'
+    | '/demo/start/api-request'
+    | '/demo/start/server-funcs'
   id:
-    | "__root__"
-    | "/"
-    | "/_authed"
-    | "/_authed/dashboard"
-    | "/demo/clerk"
-    | "/demo/convex"
-    | "/demo/form/address"
-    | "/demo/form/simple"
-    | "/demo/start/api-request"
-    | "/demo/start/server-funcs";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/_authed/dashboard'
+    | '/demo/clerk'
+    | '/demo/convex'
+    | '/demo/form/address'
+    | '/demo/form/simple'
+    | '/demo/start/api-request'
+    | '/demo/start/server-funcs'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AuthedRoute: typeof AuthedRouteWithChildren;
-  DemoClerkRoute: typeof DemoClerkRoute;
-  DemoConvexRoute: typeof DemoConvexRoute;
-  DemoFormAddressRoute: typeof DemoFormAddressRoute;
-  DemoFormSimpleRoute: typeof DemoFormSimpleRoute;
-  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute;
-  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute;
+  IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  DemoClerkRoute: typeof DemoClerkRoute
+  DemoConvexRoute: typeof DemoConvexRoute
+  DemoFormAddressRoute: typeof DemoFormAddressRoute
+  DemoFormSimpleRoute: typeof DemoFormSimpleRoute
+  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
+  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
 }
 export interface FileServerRoutesByFullPath {
-  "/api/demo-names": typeof ApiDemoNamesServerRoute;
+  '/api/demo-names': typeof ApiDemoNamesServerRoute
 }
 export interface FileServerRoutesByTo {
-  "/api/demo-names": typeof ApiDemoNamesServerRoute;
+  '/api/demo-names': typeof ApiDemoNamesServerRoute
 }
 export interface FileServerRoutesById {
-  __root__: typeof rootServerRouteImport;
-  "/api/demo-names": typeof ApiDemoNamesServerRoute;
+  __root__: typeof rootServerRouteImport
+  '/api/demo-names': typeof ApiDemoNamesServerRoute
 }
 export interface FileServerRouteTypes {
-  fileServerRoutesByFullPath: FileServerRoutesByFullPath;
-  fullPaths: "/api/demo-names";
-  fileServerRoutesByTo: FileServerRoutesByTo;
-  to: "/api/demo-names";
-  id: "__root__" | "/api/demo-names";
-  fileServerRoutesById: FileServerRoutesById;
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths: '/api/demo-names'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to: '/api/demo-names'
+  id: '__root__' | '/api/demo-names'
+  fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
-  ApiDemoNamesServerRoute: typeof ApiDemoNamesServerRoute;
+  ApiDemoNamesServerRoute: typeof ApiDemoNamesServerRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/_authed": {
-      id: "/_authed";
-      path: "";
-      fullPath: "";
-      preLoaderRoute: typeof AuthedRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/convex": {
-      id: "/demo/convex";
-      path: "/demo/convex";
-      fullPath: "/demo/convex";
-      preLoaderRoute: typeof DemoConvexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/clerk": {
-      id: "/demo/clerk";
-      path: "/demo/clerk";
-      fullPath: "/demo/clerk";
-      preLoaderRoute: typeof DemoClerkRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_authed/dashboard": {
-      id: "/_authed/dashboard";
-      path: "/dashboard";
-      fullPath: "/dashboard";
-      preLoaderRoute: typeof AuthedDashboardRouteImport;
-      parentRoute: typeof AuthedRoute;
-    };
-    "/demo/start/server-funcs": {
-      id: "/demo/start/server-funcs";
-      path: "/demo/start/server-funcs";
-      fullPath: "/demo/start/server-funcs";
-      preLoaderRoute: typeof DemoStartServerFuncsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/start/api-request": {
-      id: "/demo/start/api-request";
-      path: "/demo/start/api-request";
-      fullPath: "/demo/start/api-request";
-      preLoaderRoute: typeof DemoStartApiRequestRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/form/simple": {
-      id: "/demo/form/simple";
-      path: "/demo/form/simple";
-      fullPath: "/demo/form/simple";
-      preLoaderRoute: typeof DemoFormSimpleRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/demo/form/address": {
-      id: "/demo/form/address";
-      path: "/demo/form/address";
-      fullPath: "/demo/form/address";
-      preLoaderRoute: typeof DemoFormAddressRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/convex': {
+      id: '/demo/convex'
+      path: '/demo/convex'
+      fullPath: '/demo/convex'
+      preLoaderRoute: typeof DemoConvexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/clerk': {
+      id: '/demo/clerk'
+      path: '/demo/clerk'
+      fullPath: '/demo/clerk'
+      preLoaderRoute: typeof DemoClerkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/dashboard': {
+      id: '/_authed/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/demo/start/server-funcs': {
+      id: '/demo/start/server-funcs'
+      path: '/demo/start/server-funcs'
+      fullPath: '/demo/start/server-funcs'
+      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/start/api-request': {
+      id: '/demo/start/api-request'
+      path: '/demo/start/api-request'
+      fullPath: '/demo/start/api-request'
+      preLoaderRoute: typeof DemoStartApiRequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/form/simple': {
+      id: '/demo/form/simple'
+      path: '/demo/form/simple'
+      fullPath: '/demo/form/simple'
+      preLoaderRoute: typeof DemoFormSimpleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/form/address': {
+      id: '/demo/form/address'
+      path: '/demo/form/address'
+      fullPath: '/demo/form/address'
+      preLoaderRoute: typeof DemoFormAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
-declare module "@tanstack/react-start/server" {
+declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
-    "/api/demo-names": {
-      id: "/api/demo-names";
-      path: "/api/demo-names";
-      fullPath: "/api/demo-names";
-      preLoaderRoute: typeof ApiDemoNamesServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
+    '/api/demo-names': {
+      id: '/api/demo-names'
+      path: '/api/demo-names'
+      fullPath: '/api/demo-names'
+      preLoaderRoute: typeof ApiDemoNamesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
   }
 }
 
 interface AuthedRouteChildren {
-  AuthedDashboardRoute: typeof AuthedDashboardRoute;
+  AuthedDashboardRoute: typeof AuthedDashboardRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedDashboardRoute: AuthedDashboardRoute,
-};
+}
 
 const AuthedRouteWithChildren =
-  AuthedRoute._addFileChildren(AuthedRouteChildren);
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -271,13 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
   DemoFormSimpleRoute: DemoFormSimpleRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiDemoNamesServerRoute: ApiDemoNamesServerRoute,
-};
+}
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)
-  ._addFileTypes<FileServerRouteTypes>();
+  ._addFileTypes<FileServerRouteTypes>()
