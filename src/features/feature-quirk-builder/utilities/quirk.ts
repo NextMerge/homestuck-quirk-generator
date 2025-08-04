@@ -276,8 +276,8 @@ export function replaceRegex(params: {
   const tempRightParenthesis = "”";
 
   return params.text
-    .replace(new RegExp("\\(", "g"), tempLeftParenthesis)
-    .replace(new RegExp("\\)", "g"), tempRightParenthesis)
+    .replace(/\(/g, tempLeftParenthesis)
+    .replace(/\)/g, tempRightParenthesis)
     .replace(
       new RegExp(params.regex, params.caseSensitive ? "g" : "gi"),
       params.replacement,
