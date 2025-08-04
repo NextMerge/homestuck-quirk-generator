@@ -1,29 +1,34 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
-  "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
-  "files": { "ignoreUnknown": false },
-  "formatter": {
-    "enabled": true,
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
     "includes": [
-      "**",
-      "!**/package-lock.json",
-      "!**/pnpm-lock.yaml",
-      "!**/yarn.lock"
+      "**/src/**/*",
+      "**/.vscode/**/*",
+      "**/index.html",
+      "**/vite.config.js",
+      "!**/src/routeTree.gen.ts"
     ]
   },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space"
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true
-    },
-    "includes": [
-      "**",
-      "!node_modules/**",
-      "!public/**",
-      "!dist/**",
-      "!.gitignore",
-      "!prettier.config.js",
-      "!**/*.d.ts"
-    ]
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
   }
 }
