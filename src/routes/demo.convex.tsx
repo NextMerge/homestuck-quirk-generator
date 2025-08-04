@@ -1,44 +1,44 @@
-import { Suspense } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { useQuery, useMutation } from 'convex/react'
+import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQuery } from "convex/react";
+import { Suspense } from "react";
 
-import { api } from '../../convex/_generated/api'
+import { api } from "convex/_generated/api";
 
-export const Route = createFileRoute('/demo/convex')({
+export const Route = createFileRoute("/demo/convex")({
   component: App,
-})
+});
 
 function Products() {
-  const products = useQuery(api.products.get)
+  const products = useQuery(api.products.get);
 
   return (
     <ul>
-      {(products || []).map((p) => (
+      {(products ?? []).map((p) => (
         <li key={p._id}>
           {p.title} - {p.price}
         </li>
       ))}
     </ul>
-  )
+  );
 }
 
 function App() {
-  const createProduct = useMutation(api.products.create)
+  const createProduct = useMutation(api.products.create);
 
-  const handleAddProduct = () => {
-    createProduct({
-      title: `Product ${Date.now()}`,
-      imageId: `img_${Date.now()}`,
+  const handleAddProduct = async () => {
+    await createProduct({
+      title: `Product ${Date.now().toString()}`,
+      imageId: `img_${Date.now().toString()}`,
       price: Math.floor(Math.random() * 100) + 10,
-    })
-  }
+    });
+  };
 
   return (
     <div className="p-4">
       <div className="mb-4">
-        <button 
-          onClick={handleAddProduct}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        <button
+          onClick={() => void handleAddProduct()}
+          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
         >
           Add New Product
         </button>
@@ -47,5 +47,5 @@ function App() {
         <Products />
       </Suspense>
     </div>
-  )
+  );
 }
