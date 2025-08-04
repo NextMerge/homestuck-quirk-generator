@@ -83,15 +83,26 @@ const quirkAttributeValidator = v.union(
 
 export const list = query({
   args: {
-    username: v.string(),
-    collectionSlug: v.string(),
+    collectionId: v.id("collections"),
   },
   handler: async (ctx, args) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    // First verify the collection belongs to the user
+    const collection = await ctx.db.get(args.collectionId);
+    if (!collection || collection.userId !== user.tokenIdentifier) {
+      throw new Error("Collection not found or unauthorized");
+    }
+
     const quirks = await ctx.db
       .query("quirks")
-      .withIndex("by_user_and_collection", (q) =>
-        q.eq("userId", user.subject).eq("collectionSlug", args.collectionSlug),
+      .withIndex("by_collection_and_order", (q) =>
+        q.eq("collectionId", args.collectionId),
       )
+      .order("asc")
       .collect();
 
     return quirks;
@@ -103,6 +114,7 @@ export const create = mutation({
     name: v.string(),
     description: v.optional(v.string()),
     color: v.string(),
+    collectionId: v.id("collections"),
     attributes: v.array(quirkAttributeValidator),
   },
   returns: v.id("quirks"),
@@ -112,12 +124,31 @@ export const create = mutation({
       throw new Error("Unauthorized");
     }
 
+    // Verify the collection belongs to the user
+    const collection = await ctx.db.get(args.collectionId);
+    if (!collection || collection.userId !== user.tokenIdentifier) {
+      throw new Error("Collection not found or unauthorized");
+    }
+
+    // Get the highest order value for this collection to append to the end
+    const lastQuirk = await ctx.db
+      .query("quirks")
+      .withIndex("by_collection_and_order", (q) =>
+        q.eq("collectionId", args.collectionId),
+      )
+      .order("desc")
+      .first();
+
+    const nextOrder = lastQuirk ? lastQuirk.order + 1 : 0;
+
     return await ctx.db.insert("quirks", {
       name: args.name,
       description: args.description,
       color: args.color,
+      order: nextOrder,
+      collectionId: args.collectionId,
       attributes: args.attributes,
-      userId: user.subject,
+      userId: user.tokenIdentifier,
     });
   },
 });
@@ -138,11 +169,11 @@ export const update = mutation({
     }
 
     const quirk = await ctx.db.get(args.id);
-    if (!quirk || quirk.userId !== user.subject) {
+    if (!quirk || quirk.userId !== user.tokenIdentifier) {
       throw new Error("Quirk not found or unauthorized");
     }
 
-    const updates: Record<string, any> = {};
+    const updates: Record<string, unknown> = {};
     if (args.name !== undefined) updates.name = args.name;
     if (args.description !== undefined) updates.description = args.description;
     if (args.color !== undefined) updates.color = args.color;
@@ -165,11 +196,76 @@ export const remove = mutation({
     }
 
     const quirk = await ctx.db.get(args.id);
-    if (!quirk || quirk.userId !== user.subject) {
+    if (!quirk || quirk.userId !== user.tokenIdentifier) {
       throw new Error("Quirk not found or unauthorized");
     }
 
     await ctx.db.delete(args.id);
+    return null;
+  },
+});
+
+// Reorder quirks within a collection
+export const reorder = mutation({
+  args: {
+    quirkId: v.id("quirks"),
+    newOrder: v.number(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    const quirk = await ctx.db.get(args.quirkId);
+    if (!quirk || quirk.userId !== user.tokenIdentifier) {
+      throw new Error("Quirk not found or unauthorized");
+    }
+
+    const oldOrder = quirk.order;
+    const newOrder = args.newOrder;
+
+    if (oldOrder === newOrder) {
+      return null; // No change needed
+    }
+
+    // Get all quirks in the same collection
+    const allQuirks = await ctx.db
+      .query("quirks")
+      .withIndex("by_collection_and_order", (q) =>
+        q.eq("collectionId", quirk.collectionId),
+      )
+      .collect();
+
+    // Update the target quirk first
+    await ctx.db.patch(args.quirkId, { order: newOrder });
+
+    // Shift other quirks as needed
+    if (oldOrder < newOrder) {
+      // Moving down: shift items between oldOrder+1 and newOrder up by 1
+      for (const otherQuirk of allQuirks) {
+        if (
+          otherQuirk._id !== args.quirkId &&
+          otherQuirk.order > oldOrder &&
+          otherQuirk.order <= newOrder
+        ) {
+          await ctx.db.patch(otherQuirk._id, { order: otherQuirk.order - 1 });
+        }
+      }
+    } else {
+      // Moving up: shift items between newOrder and oldOrder-1 down by 1
+      for (const otherQuirk of allQuirks) {
+        if (
+          otherQuirk._id !== args.quirkId &&
+          otherQuirk.order >= newOrder &&
+          otherQuirk.order < oldOrder
+        ) {
+          await ctx.db.patch(otherQuirk._id, { order: otherQuirk.order + 1 });
+        }
+      }
+    }
+
     return null;
   },
 });

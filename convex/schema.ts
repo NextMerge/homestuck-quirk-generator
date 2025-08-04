@@ -12,16 +12,19 @@ export default defineSchema({
     name: v.string(),
     slug: v.string(),
     description: v.string(),
+    order: v.number(),
     userId: v.string(),
   })
     .index("by_user", ["userId"])
-    .index("by_slug", ["slug"])
-    .index("by_user_and_slug", ["userId", "slug"]),
+    .index("by_user_and_order", ["userId", "order"])
+    .index("by_slug", ["slug"]),
 
   quirks: defineTable({
     name: v.string(),
     description: v.optional(v.string()),
     color: v.string(),
+    order: v.number(),
+    collectionId: v.id("collections"),
     attributes: v.array(
       v.union(
         // Simple Replace Attribute
@@ -103,5 +106,7 @@ export default defineSchema({
       ),
     ),
     userId: v.string(),
-  }).index("by_user", ["userId"]),
+  })
+    .index("by_collection", ["collectionId"])
+    .index("by_collection_and_order", ["collectionId", "order"]),
 });
