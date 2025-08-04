@@ -1,18 +1,14 @@
+import { useAuth } from "@clerk/clerk-react";
 import {
+  createRootRoute,
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-
 import Header from "../components/Header";
-
 import ClerkProvider from "../integrations/clerk/provider.tsx";
-
 import ConvexProvider from "../integrations/convex/provider.tsx";
-
-import { useAuth } from "@clerk/clerk-react";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
