@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusIcon } from "lucide-react";
-import { NAME_MAX_LENGTH } from "convex/limits";
+import { COLLECTION_COUNT_MAX, NAME_MAX_LENGTH } from "convex/limits";
 import { convertToSlug } from "@/lib/slugify";
 
 type CreateCollectionFormData = {
@@ -59,13 +59,21 @@ export function CreateCollectionDialog({ existingCollectionNames }: Props) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <PlusIcon className="w-4 h-4" />
-          New Collection
-        </Button>
+        {existingCollectionNames.length <= COLLECTION_COUNT_MAX ? (
+          <Button variant="outline">
+            <PlusIcon className="w-4 h-4" />
+            New Collection
+          </Button>
+        ) : (
+          <Button variant="outline" disabled className="cursor-not-allowed">
+            <PlusIcon className="w-4 h-4" />
+            You have reached the maximum number of collections
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form
+          autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -114,12 +122,12 @@ export function CreateCollectionDialog({ existingCollectionNames }: Props) {
             >
               {(field) => (
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
+                  <Label htmlFor={field.name} className="text-right">
                     Name*
                   </Label>
                   <div className="col-span-3">
                     <Input
-                      id="name"
+                      id={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -129,6 +137,7 @@ export function CreateCollectionDialog({ existingCollectionNames }: Props) {
                           ? "border-red-500"
                           : ""
                       }
+                      autoComplete="off"
                     />
                     {field.state.meta.errors.length > 0 && (
                       <div className="text-red-500 text-sm mt-1">
@@ -152,12 +161,12 @@ export function CreateCollectionDialog({ existingCollectionNames }: Props) {
             >
               {(field) => (
                 <div className="grid grid-cols-4 items-start gap-4">
-                  <Label htmlFor="description" className="text-right pt-2">
+                  <Label htmlFor={field.name} className="text-right pt-2">
                     Description
                   </Label>
                   <div className="col-span-3">
                     <Textarea
-                      id="description"
+                      id={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}

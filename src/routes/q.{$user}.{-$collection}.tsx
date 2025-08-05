@@ -1,4 +1,6 @@
 import { CollectionViewer } from "@/features/feature-quirk-builder/ui/CollectionViewer";
+import { QuirkViewer } from "@/features/feature-quirk-builder/ui/QuirkViewer";
+import { QuirkProvider } from "@/features/feature-quirk-builder/ui/QuirkContext";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/q/{$user}/{-$collection}")({
@@ -8,13 +10,13 @@ export const Route = createFileRoute("/q/{$user}/{-$collection}")({
 function RouteComponent() {
   const { user, collection } = Route.useParams();
 
-  if (collection !== undefined) {
-    return <div>Collection not found</div>;
-  }
-
   return (
-    <main className="p-4">
-      <CollectionViewer usernameSlug={user} />
+    <main className="p-6">
+      {collection === undefined ? (
+        <CollectionViewer usernameSlug={user} />
+      ) : (
+        <QuirkViewer usernameSlug={user} collectionSlug={collection} />
+      )}
     </main>
   );
 }

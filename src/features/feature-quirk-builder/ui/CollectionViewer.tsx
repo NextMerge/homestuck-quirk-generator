@@ -1,5 +1,5 @@
 import { api } from "convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { Link } from "@tanstack/react-router";
 import type { Id } from "convex/_generated/dataModel";
 import { Tile } from "@/components/Tile";
@@ -8,7 +8,12 @@ import { Separator } from "@/components/ui/separator";
 import { CreateCollectionDialog } from "./CreateCollectionDialog";
 import { DeleteCollectionDialog } from "./DeleteCollectionDialog";
 import { convertToSlug } from "@/lib/slugify";
-import { EditIcon, Trash2Icon } from "lucide-react";
+import {
+  EditIcon,
+  Trash2Icon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+} from "lucide-react";
 
 type Collection = {
   _id: Id<"collections">;
@@ -25,6 +30,7 @@ export function CollectionViewer(props: Props) {
   const data = useQuery(api.collections.list, {
     usernameSlug: props.usernameSlug,
   });
+  const reorderCollection = useMutation(api.collections.reorder);
 
   if (data === undefined) {
     return <div>Loading...</div>;
@@ -33,6 +39,38 @@ export function CollectionViewer(props: Props) {
   const existingCollectionNames = data.collections.map(
     (collection: Collection) => collection.name,
   );
+
+  const handleMoveUp = async (
+    collectionId: Id<"collections">,
+    currentOrder: number,
+  ) => {
+    if (currentOrder > 0) {
+      try {
+        await reorderCollection({
+          collectionId,
+          newOrder: currentOrder - 1,
+        });
+      } catch (error) {
+        console.error("Failed to move collection up:", error);
+      }
+    }
+  };
+
+  const handleMoveDown = async (
+    collectionId: Id<"collections">,
+    currentOrder: number,
+  ) => {
+    if (currentOrder < data.collections.length - 1) {
+      try {
+        await reorderCollection({
+          collectionId,
+          newOrder: currentOrder + 1,
+        });
+      } catch (error) {
+        console.error("Failed to move collection down:", error);
+      }
+    }
+  };
 
   return (
     <Tile>
@@ -69,7 +107,29 @@ export function CollectionViewer(props: Props) {
                   </div>
 
                   {data.collectionBelongsToUser && (
-                    <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center gap-1 ml-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                        onClick={() =>
+                          handleMoveUp(collection._id, collection.order)
+                        }
+                        disabled={index === 0}
+                      >
+                        <ChevronUpIcon className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                        onClick={() =>
+                          handleMoveDown(collection._id, collection.order)
+                        }
+                        disabled={index === data.collections.length - 1}
+                      >
+                        <ChevronDownIcon className="w-4 h-4" />
+                      </Button>
                       <Link
                         to="/q/{$user}/{-$collection}"
                         params={{
@@ -80,7 +140,7 @@ export function CollectionViewer(props: Props) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-gray-600 hover:text-gray-700 hover:bg-gray-100"
+                          className="text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                         >
                           <EditIcon className="w-4 h-4" />
                         </Button>
