@@ -86,14 +86,14 @@ export const list = query({
     collectionId: v.id("collections"),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new Error("Unauthorized");
     }
 
     // First verify the collection belongs to the user
     const collection = await ctx.db.get(args.collectionId);
-    if (!collection || collection.userId !== user.tokenIdentifier) {
+    if (!collection || collection.userId !== identity.tokenIdentifier) {
       throw new Error("Collection not found or unauthorized");
     }
 
@@ -119,14 +119,14 @@ export const create = mutation({
   },
   returns: v.id("quirks"),
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new Error("Unauthorized");
     }
 
     // Verify the collection belongs to the user
     const collection = await ctx.db.get(args.collectionId);
-    if (!collection || collection.userId !== user.tokenIdentifier) {
+    if (!collection || collection.userId !== identity.tokenIdentifier) {
       throw new Error("Collection not found or unauthorized");
     }
 
@@ -148,7 +148,7 @@ export const create = mutation({
       order: nextOrder,
       collectionId: args.collectionId,
       attributes: args.attributes,
-      userId: user.tokenIdentifier,
+      userId: identity.tokenIdentifier,
     });
   },
 });
@@ -163,13 +163,13 @@ export const update = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new Error("Unauthorized");
     }
 
     const quirk = await ctx.db.get(args.id);
-    if (!quirk || quirk.userId !== user.tokenIdentifier) {
+    if (!quirk || quirk.userId !== identity.tokenIdentifier) {
       throw new Error("Quirk not found or unauthorized");
     }
 
@@ -190,13 +190,13 @@ export const remove = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new Error("Unauthorized");
     }
 
     const quirk = await ctx.db.get(args.id);
-    if (!quirk || quirk.userId !== user.tokenIdentifier) {
+    if (!quirk || quirk.userId !== identity.tokenIdentifier) {
       throw new Error("Quirk not found or unauthorized");
     }
 
@@ -213,13 +213,13 @@ export const reorder = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new Error("Unauthorized");
     }
 
     const quirk = await ctx.db.get(args.quirkId);
-    if (!quirk || quirk.userId !== user.tokenIdentifier) {
+    if (!quirk || quirk.userId !== identity.tokenIdentifier) {
       throw new Error("Quirk not found or unauthorized");
     }
 

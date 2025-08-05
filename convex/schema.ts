@@ -2,22 +2,23 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  products: defineTable({
-    title: v.string(),
-    imageId: v.string(),
-    price: v.number(),
-  }),
+  users: defineTable({
+    clerkId: v.string(),
+    username: v.string(),
+    usernameSlug: v.string(),
+  })
+    .index("by_clerk_id", ["clerkId"])
+    .index("by_username", ["username"])
+    .index("by_username_slug", ["usernameSlug"]),
 
   collections: defineTable({
     name: v.string(),
-    slug: v.string(),
     description: v.string(),
     order: v.number(),
     userId: v.string(),
   })
     .index("by_user", ["userId"])
-    .index("by_user_and_order", ["userId", "order"])
-    .index("by_slug", ["slug"]),
+    .index("by_user_and_order", ["userId", "order"]),
 
   quirks: defineTable({
     name: v.string(),

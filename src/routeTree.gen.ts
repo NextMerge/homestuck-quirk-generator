@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoConvexRouteImport } from './routes/demo.convex'
 import { Route as DemoClerkRouteImport } from './routes/demo.clerk'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as QChar123userChar125Char123CollectionChar125RouteImport } from './routes/q.{$user}.{-$collection}'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo.start.api-request'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo.form.simple'
@@ -48,6 +49,12 @@ const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
+const QChar123userChar125Char123CollectionChar125Route =
+  QChar123userChar125Char123CollectionChar125RouteImport.update({
+    id: '/q/{$user}/{-$collection}',
+    path: '/q/{$user}/{-$collection}',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
   path: '/demo/start/server-funcs',
@@ -83,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/q/{$user}/{-$collection}': typeof QChar123userChar125Char123CollectionChar125Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,6 +101,7 @@ export interface FileRoutesByTo {
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/q/{$user}/{-$collection}': typeof QChar123userChar125Char123CollectionChar125Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -105,6 +114,7 @@ export interface FileRoutesById {
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/q/{$user}/{-$collection}': typeof QChar123userChar125Char123CollectionChar125Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/q/{$user}/{-$collection}'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/q/{$user}/{-$collection}'
   id:
     | '__root__'
     | '/'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/q/{$user}/{-$collection}'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -149,6 +162,7 @@ export interface RootRouteChildren {
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  QChar123userChar125Char123CollectionChar125Route: typeof QChar123userChar125Char123CollectionChar125Route
 }
 export interface FileServerRoutesByFullPath {
   '/api/demo-names': typeof ApiDemoNamesServerRoute
@@ -208,6 +222,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/q/{$user}/{-$collection}': {
+      id: '/q/{$user}/{-$collection}'
+      path: '/q/{$user}/{-$collection}'
+      fullPath: '/q/{$user}/{-$collection}'
+      preLoaderRoute: typeof QChar123userChar125Char123CollectionChar125RouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
@@ -271,6 +292,8 @@ const rootRouteChildren: RootRouteChildren = {
   DemoFormSimpleRoute: DemoFormSimpleRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  QChar123userChar125Char123CollectionChar125Route:
+    QChar123userChar125Char123CollectionChar125Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

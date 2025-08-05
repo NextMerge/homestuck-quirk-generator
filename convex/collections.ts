@@ -1,68 +1,96 @@
 import { v } from "convex/values";
-import slugify from "slugify";
 import { mutation, query } from "./_generated/server";
+import { COLLECTION_COUNT_MAX } from "./limits";
 
 export const list = query({
-  args: {},
-  handler: async (ctx) => {
-    const user = await ctx.auth.getUserIdentity();
+  args: {
+    usernameSlug: v.string(),
+  },
+  returns: v.object({
+    collections: v.array(
+      v.object({
+        _id: v.id("collections"),
+        name: v.string(),
+        description: v.string(),
+        order: v.number(),
+      }),
+    ),
+    collectionBelongsToUser: v.boolean(),
+  }),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_username_slug", (q) =>
+        q.eq("usernameSlug", args.usernameSlug),
+      )
+      .unique();
+
     if (!user) {
-      throw new Error("Unauthorized");
+      throw new Error("User not found");
     }
 
     const collections = await ctx.db
       .query("collections")
-      .withIndex("by_user_and_order", (q) =>
-        q.eq("userId", user.tokenIdentifier),
-      )
+      .withIndex("by_user_and_order", (q) => q.eq("userId", user.clerkId))
       .order("asc")
       .collect();
 
-    return collections;
+    return {
+      collections: collections.map((collection) => ({
+        _id: collection._id,
+        name: collection.name,
+        description: collection.description,
+        order: collection.order,
+      })),
+      collectionBelongsToUser: identity?.subject === user.clerkId,
+    };
   },
 });
 
 export const create = mutation({
   args: {
     name: v.string(),
-    slug: v.string(),
     description: v.string(),
   },
   returns: v.id("collections"),
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new Error("Unauthorized");
     }
 
-    const slugCandidate = args.slug;
-
     const existingCollection = await ctx.db
       .query("collections")
-      .withIndex("by_slug", (q) => q.eq("slug", slugCandidate))
-      .first();
+      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+      .filter((q) => q.eq(q.field("name"), args.name))
+      .unique();
 
     if (existingCollection) {
-      throw new Error("Collection with this slug already exists");
+      throw new Error("Collection with this name already exists");
     }
 
     // Get the highest order value for this user to append to the end
-    const lastCollection = await ctx.db
+    const userCollections = await ctx.db
       .query("collections")
-      .withIndex("by_user_and_order", (q) =>
-        q.eq("userId", user.tokenIdentifier),
-      )
+      .withIndex("by_user_and_order", (q) => q.eq("userId", identity.subject))
       .order("desc")
-      .first();
+      .collect();
+
+    if (userCollections.length >= COLLECTION_COUNT_MAX) {
+      throw new Error("You have reached the maximum number of collections");
+    }
+
+    const lastCollection = userCollections[0] ?? null;
 
     const nextOrder = lastCollection ? lastCollection.order + 1 : 0;
 
     return await ctx.db.insert("collections", {
-      name: args.name,
-      slug: slugCandidate,
-      description: args.description,
+      name: args.name.trim(),
+      description: args.description.trim(),
       order: nextOrder,
-      userId: user.tokenIdentifier,
+      userId: identity.subject,
     });
   },
 });
@@ -75,13 +103,13 @@ export const reorder = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new Error("Unauthorized");
     }
 
     const collection = await ctx.db.get(args.collectionId);
-    if (!collection || collection.userId !== user.tokenIdentifier) {
+    if (!collection || collection.userId !== identity.subject) {
       throw new Error("Collection not found or unauthorized");
     }
 
@@ -95,9 +123,7 @@ export const reorder = mutation({
     // Get all collections for this user
     const allCollections = await ctx.db
       .query("collections")
-      .withIndex("by_user_and_order", (q) =>
-        q.eq("userId", user.tokenIdentifier),
-      )
+      .withIndex("by_user_and_order", (q) => q.eq("userId", identity.subject))
       .collect();
 
     // Update the target collection first
@@ -130,6 +156,43 @@ export const reorder = mutation({
           });
         }
       }
+    }
+
+    return null;
+  },
+});
+
+export const deleteCollection = mutation({
+  args: {
+    collectionId: v.id("collections"),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    const collection = await ctx.db.get(args.collectionId);
+    if (!collection || collection.userId !== identity.subject) {
+      throw new Error("Collection not found or unauthorized");
+    }
+
+    // Delete the collection
+    await ctx.db.delete(args.collectionId);
+
+    // Reorder remaining collections to fill the gap
+    const remainingCollections = await ctx.db
+      .query("collections")
+      .withIndex("by_user_and_order", (q) => q.eq("userId", identity.subject))
+      .filter((q) => q.gt(q.field("order"), collection.order))
+      .collect();
+
+    // Shift all collections with higher order down by 1
+    for (const otherCollection of remainingCollections) {
+      await ctx.db.patch(otherCollection._id, {
+        order: otherCollection.order - 1,
+      });
     }
 
     return null;
