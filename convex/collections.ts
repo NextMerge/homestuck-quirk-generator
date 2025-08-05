@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { COLLECTION_COUNT_MAX } from "./limits";
+import { convertToSlug } from "@/lib/slugify";
 
 export const list = query({
   args: {
@@ -45,6 +46,58 @@ export const list = query({
         order: collection.order,
       })),
       collectionBelongsToUser: identity?.subject === user.clerkId,
+    };
+  },
+});
+
+export const get = query({
+  args: {
+    usernameSlug: v.string(),
+    collectionSlug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_username_slug", (q) =>
+        q.eq("usernameSlug", args.usernameSlug),
+      )
+      .unique();
+
+    if (!user) {
+      return null;
+    }
+
+    const collections = await ctx.db
+      .query("collections")
+      .withIndex("by_user", (q) => q.eq("userId", user.clerkId))
+      .collect();
+
+    // Find collection by matching slug
+    const collection = collections.find(c => 
+      convertToSlug(c.name) === args.collectionSlug
+    );
+
+    if (!collection) {
+      return null;
+    }
+    
+    const quirks = await ctx.db
+      .query("quirks")
+      .withIndex("by_collection_and_order", (q) =>
+        q.eq("collectionId", collection._id),
+      )
+      .order("asc")
+      .collect();
+
+    return {
+      _id: collection._id,
+      name: collection.name,
+      description: collection.description,
+      order: collection.order,
+      collectionBelongsToUser: identity?.subject === user.clerkId,
+      quirks,
     };
   },
 });

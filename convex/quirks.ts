@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalQuery, mutation } from "./_generated/server";
 
 // Define the QuirkAttribute validator for reuse
 const quirkAttributeValidator = v.union(
@@ -81,34 +81,6 @@ const quirkAttributeValidator = v.union(
   }),
 );
 
-export const list = query({
-  args: {
-    collectionId: v.id("collections"),
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
-
-    // First verify the collection belongs to the user
-    const collection = await ctx.db.get(args.collectionId);
-    if (!collection || collection.userId !== identity.tokenIdentifier) {
-      throw new Error("Collection not found or unauthorized");
-    }
-
-    const quirks = await ctx.db
-      .query("quirks")
-      .withIndex("by_collection_and_order", (q) =>
-        q.eq("collectionId", args.collectionId),
-      )
-      .order("asc")
-      .collect();
-
-    return quirks;
-  },
-});
-
 export const create = mutation({
   args: {
     name: v.string(),
@@ -126,7 +98,7 @@ export const create = mutation({
 
     // Verify the collection belongs to the user
     const collection = await ctx.db.get(args.collectionId);
-    if (!collection || collection.userId !== identity.tokenIdentifier) {
+    if (!collection || collection.userId !== identity.subject) {
       throw new Error("Collection not found or unauthorized");
     }
 

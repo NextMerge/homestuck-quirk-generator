@@ -15,9 +15,6 @@ function AuthenticatedLayout() {
       <Authenticated>
         <Outlet />
       </Authenticated>
-      <AuthLoading>
-        <p>Still loading</p>
-      </AuthLoading>
     </>
   );
 }

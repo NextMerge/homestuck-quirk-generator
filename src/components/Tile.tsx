@@ -17,7 +17,7 @@ export function Tile({ children, className }: TileProps) {
         className,
       )}
     >
-      <div className="pt-8">{children}</div>
+      <div className="p-8">{children}</div>
     </div>
   );
 }
