@@ -1,11 +1,11 @@
+import { SignInButton, UserButton } from "@clerk/clerk-react";
 import { Link } from "@tanstack/react-router";
-
-import ClerkHeader from "../integrations/clerk/header-user.tsx";
+import { Authenticated, Unauthenticated } from "convex/react";
 
 export default function Header() {
   return (
     <div className="bg-white">
-      <header className="mx-auto flex max-w-[1900px] justify-between gap-2 p-2 text-black">
+      <header className="mx-auto flex max-w-[1600px] justify-between gap-2 p-2 text-black">
         <nav className="flex flex-row">
           <div className="px-2 font-bold">
             <Link to="/">Home</Link>
@@ -37,7 +37,12 @@ export default function Header() {
         </nav>
 
         <div>
-          <ClerkHeader />
+          <Authenticated>
+            <UserButton />
+          </Authenticated>
+          <Unauthenticated>
+            <SignInButton />
+          </Unauthenticated>
         </div>
       </header>
     </div>

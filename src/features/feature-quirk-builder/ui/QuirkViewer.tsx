@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { api } from "convex/_generated/api";
+import { useQuery, useMutation } from "convex/react";
+import type { Id } from "convex/_generated/dataModel";
 import { Tile } from "@/components/Tile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,22 +84,84 @@ function QuirkViewerHeader({
   );
 }
 
-export function QuirkViewer({
-  usernameSlug: _usernameSlug,
-  collectionSlug: _collectionSlug,
-}: Props) {
-  // Temporary state - these will be replaced with actual data from Convex
-  const [collectionName, setCollectionName] = useState("Sample Collection");
-  const [collectionDescription, setCollectionDescription] = useState(
-    "This is a sample collection description",
-  );
+export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
+  // Get collection data from Convex
+  const collectionData = useQuery(api.collections.get, {
+    usernameSlug,
+    collectionSlug,
+  });
 
-  // Temporary empty quirks array - this will be replaced with actual quirks from the collection
-  const quirks: Quirk[] = [];
+  // Mutations
+  const createQuirk = useMutation(api.quirks.create);
+  const reorderQuirk = useMutation(api.quirks.reorder);
 
-  const handleAddQuirk = () => {
-    // TODO: Implement add quirk functionality
-    console.log("Add quirk clicked");
+  // Local state for the collection being edited
+  const [collectionName, setCollectionName] = useState("");
+  const [collectionDescription, setCollectionDescription] = useState("");
+
+  // Update local state when data loads
+  useEffect(() => {
+    if (collectionData) {
+      setCollectionName(collectionData.name);
+      setCollectionDescription(collectionData.description);
+    }
+  }, [collectionData]);
+
+  if (collectionData === undefined) {
+    return <div>Loading...</div>;
+  }
+
+  if (collectionData === null) {
+    return <div>Collection not found</div>;
+  }
+
+  // Convert quirks to the format expected by QuirkTable
+  const quirks: Quirk[] = collectionData.quirks.map((quirk) => ({
+    id: quirk._id,
+    name: quirk.name,
+    description: quirk.description,
+    color: quirk.color,
+    attributes: quirk.attributes,
+  }));
+
+  const handleAddQuirk = async () => {
+    try {
+      await createQuirk({
+        name: "New Quirk",
+        description: "",
+        color: "#6366f1", // Default indigo color
+        collectionId: collectionData._id,
+        attributes: [],
+      });
+    } catch (error) {
+      console.error("Failed to create quirk:", error);
+    }
+  };
+
+  const handleMoveQuirkUp = async (quirkId: string, currentOrder: number) => {
+    if (currentOrder > 0) {
+      try {
+        await reorderQuirk({
+          quirkId: quirkId as Id<"quirks">,
+          newOrder: currentOrder - 1,
+        });
+      } catch (error) {
+        console.error("Failed to move quirk up:", error);
+      }
+    }
+  };
+
+  const handleMoveQuirkDown = async (quirkId: string, currentOrder: number) => {
+    if (currentOrder < quirks.length - 1) {
+      try {
+        await reorderQuirk({
+          quirkId: quirkId as Id<"quirks">,
+          newOrder: currentOrder + 1,
+        });
+      } catch (error) {
+        console.error("Failed to move quirk down:", error);
+      }
+    }
   };
 
   return (
@@ -110,10 +175,15 @@ export function QuirkViewer({
           onAddQuirk={handleAddQuirk}
         />
         {quirks.length > 0 ? (
-          <QuirkTable quirks={quirks} />
+          <QuirkTable
+            quirks={quirks}
+            editable={collectionData.collectionBelongsToUser}
+            onMoveUp={handleMoveQuirkUp}
+            onMoveDown={handleMoveQuirkDown}
+          />
         ) : (
           <Tile>
-            <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="flex flex-col items-center justify-center text-center">
               <div className="text-gray-500 mb-4">
                 <PlusIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p className="text-lg font-medium">No quirks yet</p>
