@@ -1,62 +1,3 @@
-const attributeTypes = [
-  "simple",
-  "word",
-  "wordMatchCase",
-  "matchCase",
-  "regex",
-  "prefix",
-  "suffix",
-  "emoticon",
-  "random",
-] as const;
-
-const attributeInformation: Record<
-  (typeof attributeTypes)[number],
-  {
-    name: string;
-    description: string;
-  }
-> = {
-  simple: {
-    name: "Simple Replace",
-    description: "Replace a single character with a replacement",
-  },
-  word: {
-    name: "Word Replace",
-    description: "Replace a word with a replacement",
-  },
-  wordMatchCase: {
-    name: "Word Replace Match Case",
-    description:
-      "Replace a word with a replacement, matching the case of the original word",
-  },
-  matchCase: {
-    name: "Match Case",
-    description:
-      "Replace a character with a replacement, matching the case of the original character",
-  },
-  regex: {
-    name: "Regex Replace",
-    description: "Replace a regex with a replacement",
-  },
-  prefix: {
-    name: "Prefix",
-    description: "Add a prefix to the text",
-  },
-  suffix: {
-    name: "Suffix",
-    description: "Add a suffix to the text",
-  },
-  emoticon: {
-    name: "Emoticon",
-    description: "Replace an emoticon with a replacement",
-  },
-  random: {
-    name: "Random",
-    description: "Randomly replace a character with a replacement",
-  },
-};
-
 type BaseQuirkAttribute = {
   condition?: string;
   probability?: number;
@@ -92,7 +33,6 @@ type RegexReplaceAttribute = BaseQuirkAttribute & {
   type: "regex";
   match: string;
   replacement: string;
-  applyProbabilityToEachMatch?: boolean;
   caseSensitive?: boolean;
 };
 
@@ -244,14 +184,14 @@ export function replaceWordMatchCase(params: {
         const replacementChar = replacement[i];
 
         // Apply case of original character to replacement character
-        if (originalChar === originalChar.toUpperCase()) {
-          result += replacementChar.toUpperCase();
+        if (originalChar === originalChar?.toUpperCase()) {
+          result += replacementChar?.toUpperCase() ?? "";
         } else {
-          result += replacementChar.toLowerCase();
+          result += replacementChar?.toLowerCase() ?? "";
         }
       } else {
         // If replacement is longer than original, keep remaining chars lowercase
-        result += replacement[i].toLowerCase();
+        result += replacement[i]?.toLowerCase() ?? "";
       }
     }
 
@@ -270,7 +210,6 @@ export function replaceRegex(params: {
   replacement: string;
   caseSensitive: boolean;
   probability: number;
-  applyProbabilityToEachMatch: boolean;
 }) {
   const tempLeftParenthesis = "“";
   const tempRightParenthesis = "”";
@@ -364,9 +303,11 @@ function replaceRandom(params: {
       if (mathRandom > params.probability) {
         return match;
       }
-      return params.replacements[
-        Math.floor(mathRandom * params.replacements.length)
-      ].replace("$1", match);
+      return (
+        params.replacements[
+          Math.floor(mathRandom * params.replacements.length)
+        ]?.replace("$1", match) ?? ""
+      );
     },
   );
 }
@@ -375,7 +316,7 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
   return params.quirk.attributes.reduce((acc, attribute) => {
     const mathRandom = Math.random();
     if (
-      attribute.probability &&
+      attribute.probability !== undefined &&
       attribute.type !== "random" &&
       mathRandom > attribute.probability
     ) {
@@ -420,8 +361,6 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
           replacement: attribute.replacement,
           caseSensitive: attribute.caseSensitive ?? false,
           probability: attribute.probability ?? 1,
-          applyProbabilityToEachMatch:
-            attribute.applyProbabilityToEachMatch ?? false,
         });
       case "prefix":
         return `${attribute.text}${acc}`;
@@ -435,6 +374,7 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
           replacementFrown: attribute.replacementFrown,
         });
       case "random":
+        console.log(attribute.probability, attribute.type);
         return replaceRandom({
           text: acc,
           match: attribute.match,

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { PlusIcon } from "lucide-react";
 import { QuirkTable } from "./QuirkTable";
 import { QuirkProvider, useQuirkContext } from "./QuirkContext";
+import CreateQuirkDialog from "./CreateQuirkDialog";
 import type { Quirk } from "../utilities/quirk";
 
 type Props = {
@@ -92,12 +93,12 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
   });
 
   // Mutations
-  const createQuirk = useMutation(api.quirks.create);
   const reorderQuirk = useMutation(api.quirks.reorder);
 
   // Local state for the collection being edited
   const [collectionName, setCollectionName] = useState("");
   const [collectionDescription, setCollectionDescription] = useState("");
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   // Update local state when data loads
   useEffect(() => {
@@ -124,18 +125,8 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
     attributes: quirk.attributes,
   }));
 
-  const handleAddQuirk = async () => {
-    try {
-      await createQuirk({
-        name: "New Quirk",
-        description: "",
-        color: "#6366f1", // Default indigo color
-        collectionId: collectionData._id,
-        attributes: [],
-      });
-    } catch (error) {
-      console.error("Failed to create quirk:", error);
-    }
+  const handleAddQuirk = () => {
+    setShowCreateDialog(true);
   };
 
   const handleMoveQuirkUp = async (quirkId: string, currentOrder: number) => {
@@ -196,6 +187,13 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
             </div>
           </Tile>
         )}
+
+        <CreateQuirkDialog
+          open={showCreateDialog}
+          onOpenChange={setShowCreateDialog}
+          collectionId={collectionData._id}
+          existingQuirks={collectionData.quirks}
+        />
       </div>
     </QuirkProvider>
   );
