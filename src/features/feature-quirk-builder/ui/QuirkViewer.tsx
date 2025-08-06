@@ -8,9 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PlusIcon } from "lucide-react";
 import { QuirkTable } from "./QuirkTable";
-import { QuirkProvider, useQuirkContext } from "./QuirkContext";
+import { phrase, QuirkProvider, useQuirkContext } from "./QuirkContext";
 import CreateQuirkDialog from "./CreateQuirkDialog";
 import type { Quirk } from "../utilities/quirk";
+import { QUIRK_COUNT_MAX } from "convex/limits";
 
 type Props = {
   usernameSlug: string;
@@ -22,6 +23,7 @@ type QuirkViewerHeaderProps = {
   collectionDescription: string;
   onAddQuirk: () => void;
   isOwner: boolean;
+  quirkCount: number;
 };
 
 function QuirkViewerHeader({
@@ -29,6 +31,7 @@ function QuirkViewerHeader({
   collectionDescription,
   onAddQuirk,
   isOwner,
+  quirkCount,
 }: QuirkViewerHeaderProps) {
   const { inputText, setInputText } = useQuirkContext();
 
@@ -50,6 +53,11 @@ function QuirkViewerHeader({
             <Textarea
               id="input-text"
               value={inputText}
+              onFocus={() => {
+                if (inputText === phrase && !isOwner) {
+                  setInputText("");
+                }
+              }}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Enter text to test quirks"
               rows={3}
@@ -58,9 +66,23 @@ function QuirkViewerHeader({
           </div>
           {isOwner && (
             <div className="flex flex-col gap-2">
-              <Button onClick={onAddQuirk} className="whitespace-nowrap">
+              <Button
+                onClick={onAddQuirk}
+                className="whitespace-nowrap"
+                disabled={quirkCount >= QUIRK_COUNT_MAX}
+                title={
+                  quirkCount >= QUIRK_COUNT_MAX
+                    ? `Maximum ${QUIRK_COUNT_MAX} quirks per collection`
+                    : "Add a new quirk"
+                }
+              >
                 <PlusIcon className="w-4 h-4" />
                 Add Quirk
+                {quirkCount >= QUIRK_COUNT_MAX && (
+                  <span className="text-xs text-gray-500">
+                    (Maximum {QUIRK_COUNT_MAX} quirks per collection)
+                  </span>
+                )}
               </Button>
             </div>
           )}
@@ -138,6 +160,7 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
           collectionDescription={collectionData.description}
           onAddQuirk={handleAddQuirk}
           isOwner={collectionData.collectionBelongsToUser}
+          quirkCount={quirks.length}
         />
         {quirks.length > 0 ? (
           <QuirkTable
@@ -145,6 +168,8 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
             editable={collectionData.collectionBelongsToUser}
             onMoveUp={handleMoveQuirkUp}
             onMoveDown={handleMoveQuirkDown}
+            pinKey={`${usernameSlug}-${collectionSlug}`}
+            currentCollectionId={collectionData._id}
           />
         ) : (
           <Tile>
@@ -159,7 +184,15 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
                 </p>
               </div>
               {collectionData.collectionBelongsToUser && (
-                <Button onClick={handleAddQuirk}>
+                <Button
+                  onClick={handleAddQuirk}
+                  disabled={quirks.length >= QUIRK_COUNT_MAX}
+                  title={
+                    quirks.length >= QUIRK_COUNT_MAX
+                      ? `Maximum ${QUIRK_COUNT_MAX} quirks per collection`
+                      : "Add your first quirk"
+                  }
+                >
                   <PlusIcon className="w-4 h-4" />
                   Add Quirk
                 </Button>

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { internalQuery, mutation } from "./_generated/server";
+import { mutation } from "./_generated/server";
+import { QUIRK_COUNT_MAX, ATTRIBUTE_COUNT_MAX } from "./limits";
 
 // Define the QuirkAttribute validator for reuse
 const quirkAttributeValidator = v.union(
@@ -102,6 +103,11 @@ export const create = mutation({
       throw new Error("Collection not found or unauthorized");
     }
 
+    // Check attribute count limit
+    if (args.attributes.length > ATTRIBUTE_COUNT_MAX) {
+      throw new Error(`Maximum ${ATTRIBUTE_COUNT_MAX} attributes allowed per quirk`);
+    }
+
     // Get the highest order value for this collection to append to the end
     const lastQuirk = await ctx.db
       .query("quirks")
@@ -109,9 +115,13 @@ export const create = mutation({
         q.eq("collectionId", args.collectionId),
       )
       .order("desc")
-      .first();
+      .collect();
+    
+    if (lastQuirk.length >= QUIRK_COUNT_MAX) {
+      throw new Error("Collection has reached the maximum number of quirks");
+    }
 
-    const nextOrder = lastQuirk ? lastQuirk.order + 1 : 0;
+    const nextOrder = lastQuirk[0]?.order ?? 0 + 1;
 
     return await ctx.db.insert("quirks", {
       name: args.name,
@@ -143,6 +153,11 @@ export const update = mutation({
     const quirk = await ctx.db.get(args.id);
     if (!quirk || quirk.userId !== identity.tokenIdentifier) {
       throw new Error("Quirk not found or unauthorized");
+    }
+
+    // Check attribute count limit if attributes are being updated
+    if (args.attributes !== undefined && args.attributes.length > ATTRIBUTE_COUNT_MAX) {
+      throw new Error(`Maximum ${ATTRIBUTE_COUNT_MAX} attributes allowed per quirk`);
     }
 
     const updates: Record<string, unknown> = {};
@@ -239,5 +254,67 @@ export const reorder = mutation({
     }
 
     return null;
+  },
+});
+
+export const copyToCollection = mutation({
+  args: {
+    targetCollectionId: v.id("collections"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    color: v.string(),
+    attributes: v.array(quirkAttributeValidator),
+  },
+  returns: v.id("quirks"),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    // Verify the target collection belongs to the user
+    const targetCollection = await ctx.db.get(args.targetCollectionId);
+    if (!targetCollection || targetCollection.userId !== identity.subject) {
+      throw new Error("Target collection not found or unauthorized");
+    }
+
+    // Check attribute count limit
+    if (args.attributes.length > ATTRIBUTE_COUNT_MAX) {
+      throw new Error(`Maximum ${ATTRIBUTE_COUNT_MAX} attributes allowed per quirk`);
+    }
+
+    // Check if target collection has reached the quirk limit
+    const existingQuirks = await ctx.db
+      .query("quirks")
+      .withIndex("by_collection_and_order", (q) =>
+        q.eq("collectionId", args.targetCollectionId),
+      )
+      .collect();
+
+    if (existingQuirks.length >= QUIRK_COUNT_MAX) {
+      throw new Error("Target collection has reached the maximum number of quirks");
+    }
+
+    // Get the highest order value for the target collection
+    const lastQuirk = await ctx.db
+      .query("quirks")
+      .withIndex("by_collection_and_order", (q) =>
+        q.eq("collectionId", args.targetCollectionId),
+      )
+      .order("desc")
+      .first();
+
+    const nextOrder = lastQuirk ? lastQuirk.order + 1 : 0;
+
+    // Create the copy
+    return await ctx.db.insert("quirks", {
+      name: args.name,
+      description: args.description,
+      color: args.color,
+      order: nextOrder,
+      collectionId: args.targetCollectionId,
+      attributes: args.attributes,
+      userId: identity.tokenIdentifier,
+    });
   },
 });

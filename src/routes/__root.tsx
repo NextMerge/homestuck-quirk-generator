@@ -54,7 +54,7 @@ export const Route = createRootRoute({
             <footer className="bg-gray-900 border-t border-gray-800 py-4">
               <div className="mx-auto max-w-[1600px] px-4">
                 <div className="text-center text-gray-400 text-sm">
-                  Made with ❤️ by someone •{" "}
+                  Made with ❤ by someone •{" "}
                   <a
                     href="https://github.com/NextMerge/homestuck-quirk-generator"
                     target="_blank"

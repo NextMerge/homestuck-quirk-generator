@@ -55,7 +55,7 @@ function App() {
           selectedPreset={selectedPreset}
           setSelectedPreset={setSelectedPreset}
         />
-        <QuirkTable quirks={quirks} />
+        <QuirkTable quirks={quirks} pinKey="canon" />
       </main>
     </QuirkProvider>
   );

@@ -45,12 +45,6 @@ interface CreateQuirkDialogProps {
   }>;
 }
 
-interface CreateQuirkFormData {
-  name: string;
-  description: string;
-  color: string;
-}
-
 type PresetType = "blank" | "canon" | "existing";
 
 const canonQuirksByGroup = {
