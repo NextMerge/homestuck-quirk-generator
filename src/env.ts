@@ -4,7 +4,7 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     CLERK_FRONTEND_API_URL: z.string().url(),
-    CONVEX_DEPLOYMENT: z.string(),
+    // CONVEX_DEPLOYMENT: z.string(),
     CLERK_WEBHOOK_SECRET: z.string(),
   },
 
@@ -25,7 +25,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     CLERK_FRONTEND_API_URL: process.env.CLERK_FRONTEND_API_URL,
-    CONVEX_DEPLOYMENT: process.env.CONVEX_DEPLOYMENT,
+    // CONVEX_DEPLOYMENT: process.env.CONVEX_DEPLOYMENT,
     CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
     VITE_CLERK_PUBLISHABLE_KEY: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
     VITE_CONVEX_URL: import.meta.env.VITE_CONVEX_URL,
