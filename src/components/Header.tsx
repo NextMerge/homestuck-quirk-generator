@@ -1,7 +1,6 @@
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { convertToSlug } from "@/lib/slugify";
 
 export default function Header() {
   const location = useLocation();
