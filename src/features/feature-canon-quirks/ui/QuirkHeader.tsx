@@ -30,7 +30,7 @@ export function CanonQuirksHeader({
   const { inputText, setInputText } = useQuirkContext();
 
   return (
-    <Tile className="p-6">
+    <Tile>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Canon Quirks</h1>

@@ -47,7 +47,7 @@ export function QuirkTable({
 
   return (
     <>
-      <Tile className="flex flex-col gap-6 p-6">
+      <Tile>
         {quirks.map((quirk, index) => {
           const quirkedText = applyQuirk({ quirk, text: inputText });
 

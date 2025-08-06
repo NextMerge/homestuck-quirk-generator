@@ -17,13 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   Tooltip,
   TooltipContent,
@@ -37,10 +31,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Trash2Icon,
   ChevronUpIcon,
   ChevronDownIcon,
   HelpCircleIcon,
+  PlusIcon,
 } from "lucide-react";
 import type { Quirk } from "../utilities/quirk";
 
@@ -622,55 +623,31 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
 
               {/* Attributes */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-medium">
-                      Text Transformation Rules
-                    </h3>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-md">
-                        <p>
-                          Most quirks can probably be easily created with RegEx
-                          patterns, but they can be a little tricky to
-                          understand. Some presets are provided below as a
-                          starting point, but if you're ever stuck you can
-                          likely ask an AI chatbot to make the pattern for you.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Select
-                      onValueChange={(value) => {
-                        if (value) {
-                          addAttribute(value as QuirkAttribute["type"]);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Add Rule..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(attributeTypeLabels).map(
-                          ([type, label]) => (
-                            <SelectItem key={type} value={type}>
-                              {label}
-                            </SelectItem>
-                          ),
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-medium">
+                    Text Transformation Rules
+                  </h3>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-md">
+                      <p>
+                        Most quirks can probably be easily created with RegEx
+                        patterns, but they can be a little tricky to understand.
+                        Some presets are provided below as a starting point, but
+                        if you're ever stuck you can likely ask an AI chatbot to
+                        make the pattern for you.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
 
                 {attributes.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <p>No transformation rules yet</p>
                     <p className="text-sm">
-                      Add a rule using the dropdown above
+                      Add your first rule using the button below
                     </p>
                   </div>
                 ) : (
@@ -693,6 +670,46 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
                     )}
                   </div>
                 )}
+
+                {/* Add Rule Button */}
+                <div className="flex justify-center">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                        Add Rule
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="center" className="w-56">
+                      {Object.entries(attributeTypeLabels).map(
+                        ([type, label]) => (
+                          <DropdownMenuItem
+                            key={type}
+                            onClick={() =>
+                              addAttribute(type as QuirkAttribute["type"])
+                            }
+                            className="cursor-pointer"
+                          >
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">{label}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {
+                                  attributeDescriptions[
+                                    type as keyof typeof attributeDescriptions
+                                  ]
+                                }
+                              </span>
+                            </div>
+                          </DropdownMenuItem>
+                        ),
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
             </div>
 
