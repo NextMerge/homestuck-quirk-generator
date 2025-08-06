@@ -22,7 +22,12 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Homestuck Quirks",
+      },
+      {
+        name: "description",
+        content:
+          "A site that allows you to explore and build typing quirks of Homestuck characters.",
       },
     ],
     links: [
@@ -37,10 +42,30 @@ export const Route = createRootRoute({
     <RootDocument>
       <ClerkProvider>
         <ConvexProvider useClerkAuth={useAuth}>
-          <Header />
+          <div className="min-h-screen flex flex-col">
+            <Header />
 
-          <div className="mx-auto max-w-[1600px]">
-            <Outlet />
+            <main className="flex-1">
+              <div className="mx-auto max-w-[1600px]">
+                <Outlet />
+              </div>
+            </main>
+
+            <footer className="bg-gray-900 border-t border-gray-800 py-4">
+              <div className="mx-auto max-w-[1600px] px-4">
+                <div className="text-center text-gray-400 text-sm">
+                  Made with ❤️ by someone •{" "}
+                  <a
+                    href="https://github.com/NextMerge/homestuck-quirk-generator"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 transition-colors underline"
+                  >
+                    Source code
+                  </a>
+                </div>
+              </div>
+            </footer>
           </div>
           <TanStackRouterDevtools />
         </ConvexProvider>

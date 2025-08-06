@@ -169,8 +169,9 @@ function AttributeForm({
                 onClick={onMoveUp}
                 disabled={!canMoveUp}
                 className="h-8 w-8 p-0"
+                aria-label="Move attribute up"
               >
-                <ChevronUpIcon className="h-4 w-4" />
+                <ChevronUpIcon className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="ghost"
@@ -178,16 +179,18 @@ function AttributeForm({
                 onClick={onMoveDown}
                 disabled={!canMoveDown}
                 className="h-8 w-8 p-0"
+                aria-label="Move attribute down"
               >
-                <ChevronDownIcon className="h-4 w-4" />
+                <ChevronDownIcon className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onDelete}
                 className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                aria-label="Delete attribute"
               >
-                <Trash2Icon className="h-4 w-4" />
+                <Trash2Icon className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </div>

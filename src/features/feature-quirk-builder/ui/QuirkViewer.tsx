@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { api } from "convex/_generated/api";
 import { useQuery, useMutation } from "convex/react";
 import type { Id } from "convex/_generated/dataModel";
 import { Tile } from "@/components/Tile";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PlusIcon } from "lucide-react";
@@ -21,25 +20,32 @@ type Props = {
 type QuirkViewerHeaderProps = {
   collectionName: string;
   collectionDescription: string;
-  onCollectionNameChange: (name: string) => void;
-  onCollectionDescriptionChange: (description: string) => void;
   onAddQuirk: () => void;
+  isOwner: boolean;
 };
 
 function QuirkViewerHeader({
   collectionName,
   collectionDescription,
-  onCollectionNameChange,
-  onCollectionDescriptionChange,
   onAddQuirk,
+  isOwner,
 }: QuirkViewerHeaderProps) {
   const { inputText, setInputText } = useQuirkContext();
 
   return (
     <Tile>
-      <div className="flex flex-col md:flex-row gap-4 md:gap-6 md:items-start">
-        <div className="flex-1 space-y-4">
-          <div className="space-y-2">
+      <div className="space-y-4">
+        {/* Collection Name and Description - Always Read-Only */}
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold">{collectionName}</h1>
+          {collectionDescription && (
+            <p className="text-gray-600">{collectionDescription}</p>
+          )}
+        </div>
+
+        {/* Test Text Input and Add Quirk Button */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 md:items-start">
+          <div className="flex-1 space-y-2">
             <Label htmlFor="input-text">Test Text</Label>
             <Textarea
               id="input-text"
@@ -50,35 +56,14 @@ function QuirkViewerHeader({
               className="resize-none font-mono"
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="collection-name">Collection Name</Label>
-              <Input
-                id="collection-name"
-                value={collectionName}
-                onChange={(e) => onCollectionNameChange(e.target.value)}
-                placeholder="Enter collection name"
-                autoComplete="off"
-              />
+          {isOwner && (
+            <div className="flex flex-col gap-2">
+              <Button onClick={onAddQuirk} className="whitespace-nowrap">
+                <PlusIcon className="w-4 h-4" />
+                Add Quirk
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="collection-description">Description</Label>
-              <Textarea
-                id="collection-description"
-                value={collectionDescription}
-                onChange={(e) => onCollectionDescriptionChange(e.target.value)}
-                placeholder="Optional description"
-                rows={3}
-                className="resize-none"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Button onClick={onAddQuirk} className="whitespace-nowrap">
-            <PlusIcon className="w-4 h-4" />
-            Add Quirk
-          </Button>
+          )}
         </div>
       </div>
     </Tile>
@@ -95,18 +80,8 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
   // Mutations
   const reorderQuirk = useMutation(api.quirks.reorder);
 
-  // Local state for the collection being edited
-  const [collectionName, setCollectionName] = useState("");
-  const [collectionDescription, setCollectionDescription] = useState("");
+  // Local state
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-
-  // Update local state when data loads
-  useEffect(() => {
-    if (collectionData) {
-      setCollectionName(collectionData.name);
-      setCollectionDescription(collectionData.description);
-    }
-  }, [collectionData]);
 
   if (collectionData === undefined) {
     return <div>Loading...</div>;
@@ -159,11 +134,10 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
     <QuirkProvider>
       <div className="space-y-6">
         <QuirkViewerHeader
-          collectionName={collectionName}
-          collectionDescription={collectionDescription}
-          onCollectionNameChange={setCollectionName}
-          onCollectionDescriptionChange={setCollectionDescription}
+          collectionName={collectionData.name}
+          collectionDescription={collectionData.description}
           onAddQuirk={handleAddQuirk}
+          isOwner={collectionData.collectionBelongsToUser}
         />
         {quirks.length > 0 ? (
           <QuirkTable
@@ -178,12 +152,18 @@ export function QuirkViewer({ usernameSlug, collectionSlug }: Props) {
               <div className="text-gray-500 mb-4">
                 <PlusIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p className="text-lg font-medium">No quirks yet</p>
-                <p className="text-sm">Add your first quirk to get started</p>
+                <p className="text-sm">
+                  {collectionData.collectionBelongsToUser
+                    ? "Add your first quirk to get started"
+                    : "This collection is empty"}
+                </p>
               </div>
-              <Button onClick={handleAddQuirk}>
-                <PlusIcon className="w-4 h-4" />
-                Add Quirk
-              </Button>
+              {collectionData.collectionBelongsToUser && (
+                <Button onClick={handleAddQuirk}>
+                  <PlusIcon className="w-4 h-4" />
+                  Add Quirk
+                </Button>
+              )}
             </div>
           </Tile>
         )}

@@ -374,7 +374,6 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
           replacementFrown: attribute.replacementFrown,
         });
       case "random":
-        console.log(attribute.probability, attribute.type);
         return replaceRandom({
           text: acc,
           match: attribute.match,
