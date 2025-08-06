@@ -8,7 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useQuirkContext } from "../../feature-quirk-builder/ui/QuirkContext";
+import {
+  useQuirkContext,
+  phrase,
+} from "../../feature-quirk-builder/ui/QuirkContext";
 
 export type PresetType =
   | "All"
@@ -64,6 +67,11 @@ export function CanonQuirksHeader({
             value={inputText}
             onChange={(e) => {
               setInputText(e.target.value);
+            }}
+            onFocus={() => {
+              if (inputText === phrase) {
+                setInputText("");
+              }
             }}
             rows={3}
             className="resize-none"

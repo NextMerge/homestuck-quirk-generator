@@ -49,6 +49,10 @@ export function CollectionViewer(props: Props) {
     return <div>Loading...</div>;
   }
 
+  if (data === null) {
+    return <div>User not found</div>;
+  }
+
   const existingCollectionNames = data.collections.map(
     (collection: Collection) => collection.name,
   );

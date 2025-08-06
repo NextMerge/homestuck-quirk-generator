@@ -7,7 +7,7 @@ export const list = query({
   args: {
     usernameSlug: v.string(),
   },
-  returns: v.object({
+  returns: v.union(v.object({
     collections: v.array(
       v.object({
         _id: v.id("collections"),
@@ -17,7 +17,7 @@ export const list = query({
       }),
     ),
     collectionBelongsToUser: v.boolean(),
-  }),
+  }), v.null()),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
@@ -29,7 +29,7 @@ export const list = query({
       .unique();
 
     if (!user) {
-      throw new Error("User not found");
+      return null;
     }
 
     const collections = await ctx.db
@@ -288,5 +288,50 @@ export const deleteCollection = mutation({
     }
 
     return null;
+  },
+});
+
+export const getCurrentUserCollections = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      _id: v.id("collections"),
+      name: v.string(),
+      description: v.string(),
+      quirkCount: v.number(),
+    }),
+  ),
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
+    const collections = await ctx.db
+      .query("collections")
+      .withIndex("by_user_and_order", (q) => q.eq("userId", identity.subject))
+      .order("asc")
+      .collect();
+
+    // Get quirk counts for each collection
+    const collectionsWithQuirkCounts = await Promise.all(
+      collections.map(async (collection) => {
+        const quirks = await ctx.db
+          .query("quirks")
+          .withIndex("by_collection_and_order", (q) =>
+            q.eq("collectionId", collection._id),
+          )
+          .collect();
+
+        return {
+          _id: collection._id,
+          name: collection.name,
+          description: collection.description,
+          quirkCount: quirks.length,
+        };
+      }),
+    );
+
+    return collectionsWithQuirkCounts;
   },
 });

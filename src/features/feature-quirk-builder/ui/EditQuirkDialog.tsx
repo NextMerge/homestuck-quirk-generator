@@ -44,6 +44,7 @@ import {
   PlusIcon,
 } from "lucide-react";
 import type { Quirk } from "../utilities/quirk";
+import { ATTRIBUTE_COUNT_MAX } from "convex/limits";
 
 type QuirkAttribute = Quirk["attributes"][number];
 
@@ -133,7 +134,7 @@ function AttributeForm({
         const eyes = attribute.replacementEyes || "?";
         const smile = attribute.replacementSmile || "?";
         const frown = attribute.replacementFrown || "?";
-        return `${typeLabel}: ${eyes}${smile} / ${eyes}${frown}`;
+        return `${typeLabel}: eyes: ${eyes}, smile: ${smile}, frown: ${frown}`;
       }
       default:
         return typeLabel;
@@ -458,6 +459,11 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
   }, [attributes, form]);
 
   const addAttribute = (type: QuirkAttribute["type"]) => {
+    // Prevent adding attributes beyond the limit
+    if (attributes.length >= ATTRIBUTE_COUNT_MAX) {
+      return;
+    }
+
     const newAttribute: QuirkAttribute = (() => {
       switch (type) {
         case "simple":
@@ -682,9 +688,20 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-2"
+                        disabled={attributes.length >= ATTRIBUTE_COUNT_MAX}
+                        title={
+                          attributes.length >= ATTRIBUTE_COUNT_MAX
+                            ? `Maximum ${ATTRIBUTE_COUNT_MAX} attributes per quirk`
+                            : "Add a new transformation rule"
+                        }
                       >
                         <PlusIcon className="h-4 w-4" />
                         Add Rule
+                        {attributes.length >= ATTRIBUTE_COUNT_MAX && (
+                          <span className="text-xs text-gray-500">
+                            (Max {ATTRIBUTE_COUNT_MAX})
+                          </span>
+                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="center" className="w-56">
