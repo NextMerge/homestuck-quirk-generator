@@ -1,47 +1,75 @@
-import { SignInButton, UserButton } from "@clerk/clerk-react";
-import { Link } from "@tanstack/react-router";
+import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Authenticated, Unauthenticated } from "convex/react";
+import { convertToSlug } from "@/lib/slugify";
 
 export default function Header() {
+  const location = useLocation();
+  const isIndexPage = location.pathname === "/";
+  const { user } = useUser();
+
   return (
-    <div className="bg-white">
-      <header className="mx-auto flex max-w-[1600px] justify-between gap-2 p-2 text-black">
-        <nav className="flex flex-row">
-          <div className="px-2 font-bold">
-            <Link to="/">Home</Link>
+    <div className="bg-gray-900 border-b border-gray-800">
+      <header className="mx-auto flex max-w-[1600px] justify-between items-center gap-4 px-4 py-4 text-white">
+        <nav className="flex flex-row items-center gap-6">
+          <div className="font-bold text-lg">
+            <Link to="/" className="hover:text-gray-300 transition-colors">
+              Homestuck Quirks
+            </Link>
           </div>
 
-          <div className="px-2 font-bold">
-            <Link to="/demo/start/server-funcs">Start - Server Functions</Link>
-          </div>
-
-          <div className="px-2 font-bold">
-            <Link to="/demo/start/api-request">Start - API Request</Link>
-          </div>
-
-          <div className="px-2 font-bold">
-            <Link to="/demo/clerk">Clerk</Link>
-          </div>
-
-          <div className="px-2 font-bold">
-            <Link to="/demo/convex">Convex</Link>
-          </div>
-
-          <div className="px-2 font-bold">
-            <Link to="/demo/form/simple">Simple Form</Link>
-          </div>
-
-          <div className="px-2 font-bold">
-            <Link to="/demo/form/address">Address Form</Link>
-          </div>
+          <Authenticated>
+            {user?.username && (
+              <div className="font-medium">
+                <Link
+                  to={"/q/{$user}/{-$collection}"}
+                  params={{
+                    user: user.username,
+                    collection: undefined,
+                  }}
+                  className="hover:text-gray-300 transition-colors"
+                >
+                  My Collections
+                </Link>
+              </div>
+            )}
+          </Authenticated>
         </nav>
 
-        <div>
+        {/* Index page notice */}
+        {isIndexPage && (
+          <div className="hidden md:block text-center flex-1 mx-8">
+            <Unauthenticated>
+              <p className="text-gray-300 text-sm">
+                You can now build your own quirks! Better a decade late than
+                never! Sign in to start.
+              </p>
+            </Unauthenticated>
+          </div>
+        )}
+
+        <div className="flex items-center">
           <Authenticated>
-            <UserButton />
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-8 h-8",
+                  userButtonPopoverCard: "bg-gray-800 border-gray-700",
+                  userButtonPopoverActionButton:
+                    "text-gray-300 hover:bg-gray-700",
+                },
+              }}
+            />
           </Authenticated>
           <Unauthenticated>
-            <SignInButton />
+            <SignInButton>
+              <button
+                type="button"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+              >
+                Sign In
+              </button>
+            </SignInButton>
           </Unauthenticated>
         </div>
       </header>

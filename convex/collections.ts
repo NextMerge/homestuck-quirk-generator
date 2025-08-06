@@ -215,6 +215,37 @@ export const reorder = mutation({
   },
 });
 
+export const update = mutation({
+  args: {
+    collectionId: v.id("collections"),
+    name: v.optional(v.string()),
+    description: v.optional(v.string()),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+    const collection = await ctx.db.get(args.collectionId);
+    if (!collection || collection.userId !== identity.subject) {
+      throw new Error("Collection not found or unauthorized");
+    }
+
+    const updates: { name?: string; description?: string } = {};
+    if (args.name !== undefined) {
+      updates.name = args.name;
+    }
+    if (args.description !== undefined) {
+      updates.description = args.description;
+    }
+
+    await ctx.db.patch(args.collectionId, updates);
+    return null;
+  },
+});
+
 export const deleteCollection = mutation({
   args: {
     collectionId: v.id("collections"),
