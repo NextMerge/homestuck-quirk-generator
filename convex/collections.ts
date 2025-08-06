@@ -114,13 +114,12 @@ export const create = mutation({
       throw new Error("Unauthorized");
     }
 
-    const existingCollection = await ctx.db
+    const existingCollections = await ctx.db
       .query("collections")
       .withIndex("by_user", (q) => q.eq("userId", identity.subject))
-      .filter((q) => q.eq(q.field("name"), args.name))
-      .unique();
+      .collect();
 
-    if (existingCollection) {
+    if (existingCollections.some((c) => c.name === args.name.trim().toLowerCase() || convertToSlug(c.name) === convertToSlug(args.name))) {
       throw new Error("Collection with this name already exists");
     }
 
@@ -235,7 +234,16 @@ export const update = mutation({
 
     const updates: { name?: string; description?: string } = {};
     if (args.name !== undefined) {
-      updates.name = args.name;
+      const existingCollections = await ctx.db
+        .query("collections")
+        .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+        .collect();
+
+      if (existingCollections.some((c) => c.name === args.name?.trim().toLowerCase() || convertToSlug(c.name) === convertToSlug(args.name ?? ""))) {
+        throw new Error("Collection with this name already exists");
+      }
+
+      updates.name = args.name.trim();
     }
     if (args.description !== undefined) {
       updates.description = args.description;
