@@ -31,6 +31,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   Trash2Icon,
   ChevronUpIcon,
   ChevronDownIcon,
@@ -103,216 +109,313 @@ function AttributeForm({
     onChange({ ...attribute, ...updates } as QuirkAttribute);
   };
 
+  // Generate descriptive header text based on attribute type and content
+  const getAttributeDescription = () => {
+    const typeLabel = attributeTypeLabels[attribute.type];
+
+    switch (attribute.type) {
+      case "simple":
+      case "word":
+      case "wordMatchCase":
+      case "matchCase":
+      case "regex":
+        return `${typeLabel}: "${attribute.match || "?"}" → "${attribute.replacement || "?"}"`;
+      case "random": {
+        const optionsCount = attribute.replacements?.length || 0;
+        return `${typeLabel}: "${attribute.match || "?"}" → ${optionsCount} option${optionsCount !== 1 ? "s" : ""}`;
+      }
+      case "prefix":
+        return `${typeLabel}: "${attribute.text || "?"}"`;
+      case "suffix":
+        return `${typeLabel}: "${attribute.text || "?"}"`;
+      case "emoticon": {
+        const eyes = attribute.replacementEyes || "?";
+        const smile = attribute.replacementSmile || "?";
+        const frown = attribute.replacementFrown || "?";
+        return `${typeLabel}: ${eyes}${smile} / ${eyes}${frown}`;
+      }
+      default:
+        return typeLabel;
+    }
+  };
+
   return (
-    <div className="border rounded-lg p-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h4 className="font-medium">{attributeTypeLabels[attribute.type]}</h4>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{attributeDescriptions[attribute.type]}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onMoveUp}
-            disabled={!canMoveUp}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronUpIcon className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onMoveDown}
-            disabled={!canMoveDown}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronDownIcon className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onDelete}
-            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-          >
-            <Trash2Icon className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+    <div className="border rounded-lg">
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="attribute" className="border-none">
+          <div className="flex items-center justify-between w-full">
+            <AccordionTrigger className="flex-1 text-left hover:no-underline py-3 px-4">
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-sm">
+                  {getAttributeDescription()}
+                </span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{attributeDescriptions[attribute.type]}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </AccordionTrigger>
 
-      {/* Common fields based on attribute type */}
-      {(attribute.type === "simple" ||
-        attribute.type === "word" ||
-        attribute.type === "wordMatchCase" ||
-        attribute.type === "matchCase" ||
-        attribute.type === "regex" ||
-        attribute.type === "random") && (
-        <div className="space-y-2">
-          <Label>Match Text</Label>
-          <Input
-            value={attribute.match}
-            onChange={(e) => updateAttribute({ match: e.target.value })}
-            placeholder="Text to match"
-          />
-        </div>
-      )}
-
-      {(attribute.type === "simple" ||
-        attribute.type === "word" ||
-        attribute.type === "wordMatchCase" ||
-        attribute.type === "matchCase" ||
-        attribute.type === "regex") && (
-        <div className="space-y-2">
-          <Label>Replacement</Label>
-          <Input
-            value={attribute.replacement}
-            onChange={(e) => updateAttribute({ replacement: e.target.value })}
-            placeholder="Replacement text"
-          />
-        </div>
-      )}
-
-      {(attribute.type === "prefix" || attribute.type === "suffix") && (
-        <div className="space-y-2">
-          <Label>Text</Label>
-          <Input
-            value={attribute.text}
-            onChange={(e) => updateAttribute({ text: e.target.value })}
-            placeholder={
-              attribute.type === "prefix"
-                ? "Text to add at beginning"
-                : "Text to add at end"
-            }
-          />
-        </div>
-      )}
-
-      {attribute.type === "random" && (
-        <div className="space-y-2">
-          <Label>Replacement Options</Label>
-          <Textarea
-            value={attribute.replacements.join("\n")}
-            onChange={(e) =>
-              updateAttribute({
-                replacements: e.target.value.split("\n"),
-              })
-            }
-            placeholder="One replacement option per line"
-            rows={3}
-          />
-        </div>
-      )}
-
-      {attribute.type === "emoticon" && (
-        <div className="space-y-2">
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <Label>Eyes</Label>
-              <Input
-                value={attribute.replacementEyes}
-                onChange={(e) =>
-                  updateAttribute({ replacementEyes: e.target.value })
-                }
-                placeholder=":"
-              />
-            </div>
-            <div>
-              <Label>Smile</Label>
-              <Input
-                value={attribute.replacementSmile}
-                onChange={(e) =>
-                  updateAttribute({ replacementSmile: e.target.value })
-                }
-                placeholder=")"
-              />
-            </div>
-            <div>
-              <Label>Frown</Label>
-              <Input
-                value={attribute.replacementFrown}
-                onChange={(e) =>
-                  updateAttribute({ replacementFrown: e.target.value })
-                }
-                placeholder="("
-              />
+            {/* Move and delete buttons */}
+            <div className="flex items-center gap-1 px-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onMoveUp}
+                disabled={!canMoveUp}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronUpIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onMoveDown}
+                disabled={!canMoveDown}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronDownIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onDelete}
+                className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+              >
+                <Trash2Icon className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Case sensitive option for applicable types */}
-      {(attribute.type === "simple" ||
-        attribute.type === "word" ||
-        attribute.type === "regex" ||
-        attribute.type === "random") && (
-        <div className="flex items-center space-x-2">
-          <Switch
-            checked={attribute.caseSensitive || false}
-            onCheckedChange={(checked) =>
-              updateAttribute({ caseSensitive: checked })
-            }
-          />
-          <Label>Case Sensitive</Label>
-        </div>
-      )}
+          <AccordionContent className="px-4 pb-4">
+            <Accordion
+              type="multiple"
+              defaultValue={["basic"]}
+              className="w-full"
+            >
+              {/* Basic Configuration Section */}
+              <AccordionItem value="basic">
+                <AccordionTrigger className="text-sm font-medium">
+                  Basic Configuration
+                  <span className="text-xs text-muted-foreground ml-2">
+                    {attribute.type === "random"
+                      ? "Match text and replacement options"
+                      : attribute.type === "emoticon"
+                        ? "Emoticon replacement settings"
+                        : attribute.type === "prefix" ||
+                            attribute.type === "suffix"
+                          ? `Text to ${attribute.type === "prefix" ? "prepend" : "append"}`
+                          : "Match and replacement text"}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  {/* Match Text */}
+                  {(attribute.type === "simple" ||
+                    attribute.type === "word" ||
+                    attribute.type === "wordMatchCase" ||
+                    attribute.type === "matchCase" ||
+                    attribute.type === "regex" ||
+                    attribute.type === "random") && (
+                    <div className="space-y-2">
+                      <Label>Match Text</Label>
+                      <Input
+                        value={attribute.match}
+                        onChange={(e) =>
+                          updateAttribute({ match: e.target.value })
+                        }
+                        placeholder="Text to match"
+                      />
+                    </div>
+                  )}
 
-      {/* Condition field for all types */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label>Condition (optional)</Label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
-            </TooltipTrigger>
-            <TooltipContent className="max-w-sm">
-              <p>
-                RegEx pattern which will only perform this attribute if the
-                inputted text matches it. If left blank the attribute will
-                always run. Note that this condition only runs once and not for
-                every match. Use the{" "}
-                <code className="bg-gray-800 text-gray-200 px-1 rounded">
-                  Random
-                </code>{" "}
-                attribute instead to run a condition on each match.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <Input
-          value={attribute.condition || ""}
-          onChange={(e) =>
-            updateAttribute({ condition: e.target.value || undefined })
-          }
-          placeholder="Optional condition"
-        />
-      </div>
+                  {/* Replacement Text */}
+                  {(attribute.type === "simple" ||
+                    attribute.type === "word" ||
+                    attribute.type === "wordMatchCase" ||
+                    attribute.type === "matchCase" ||
+                    attribute.type === "regex") && (
+                    <div className="space-y-2">
+                      <Label>Replacement</Label>
+                      <Input
+                        value={attribute.replacement}
+                        onChange={(e) =>
+                          updateAttribute({ replacement: e.target.value })
+                        }
+                        placeholder="Replacement text"
+                      />
+                    </div>
+                  )}
 
-      {/* Probability field for all types */}
-      <div className="space-y-2">
-        <Label>Probability (optional)</Label>
-        <Input
-          type="number"
-          min="0"
-          max="1"
-          step="0.1"
-          value={attribute.probability ?? ""}
-          onChange={(e) =>
-            updateAttribute({
-              probability: e.target.value
-                ? parseFloat(e.target.value)
-                : undefined,
-            })
-          }
-          placeholder="0.0 - 1.0"
-        />
-      </div>
+                  {/* Text for prefix/suffix */}
+                  {(attribute.type === "prefix" ||
+                    attribute.type === "suffix") && (
+                    <div className="space-y-2">
+                      <Label>Text</Label>
+                      <Input
+                        value={attribute.text}
+                        onChange={(e) =>
+                          updateAttribute({ text: e.target.value })
+                        }
+                        placeholder={
+                          attribute.type === "prefix"
+                            ? "Text to add at beginning"
+                            : "Text to add at end"
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {/* Random replacement options */}
+                  {attribute.type === "random" && (
+                    <div className="space-y-2">
+                      <Label>Replacement Options</Label>
+                      <Textarea
+                        value={attribute.replacements.join("\n")}
+                        onChange={(e) =>
+                          updateAttribute({
+                            replacements: e.target.value.split("\n"),
+                          })
+                        }
+                        placeholder="One replacement option per line"
+                        rows={4}
+                      />
+                    </div>
+                  )}
+
+                  {/* Emoticon settings */}
+                  {attribute.type === "emoticon" && (
+                    <div className="space-y-2">
+                      <Label>Emoticon Components</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <Label className="text-xs">Eyes</Label>
+                          <Input
+                            value={attribute.replacementEyes}
+                            onChange={(e) =>
+                              updateAttribute({
+                                replacementEyes: e.target.value,
+                              })
+                            }
+                            placeholder=":"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Smile</Label>
+                          <Input
+                            value={attribute.replacementSmile}
+                            onChange={(e) =>
+                              updateAttribute({
+                                replacementSmile: e.target.value,
+                              })
+                            }
+                            placeholder=")"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Frown</Label>
+                          <Input
+                            value={attribute.replacementFrown}
+                            onChange={(e) =>
+                              updateAttribute({
+                                replacementFrown: e.target.value,
+                              })
+                            }
+                            placeholder="("
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Advanced Options Section */}
+              <AccordionItem value="advanced">
+                <AccordionTrigger className="text-sm font-medium">
+                  Advanced Options
+                  <span className="text-xs text-muted-foreground ml-2">
+                    Case sensitivity, conditions, and probability
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  {/* Case sensitive option */}
+                  {(attribute.type === "simple" ||
+                    attribute.type === "word" ||
+                    attribute.type === "regex" ||
+                    attribute.type === "random") && (
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={attribute.caseSensitive || false}
+                        onCheckedChange={(checked) =>
+                          updateAttribute({ caseSensitive: checked })
+                        }
+                      />
+                      <Label>Case Sensitive</Label>
+                    </div>
+                  )}
+
+                  {/* Condition field */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label>Condition (optional)</Label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-sm">
+                          <p>
+                            RegEx pattern which will only perform this attribute
+                            if the inputted text matches it. If left blank the
+                            attribute will always run. Note that this condition
+                            only runs once and not for every match. Use the{" "}
+                            <code className="bg-gray-800 text-gray-200 px-1 rounded">
+                              Random
+                            </code>{" "}
+                            attribute instead to run a condition on each match.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <Input
+                      value={attribute.condition || ""}
+                      onChange={(e) =>
+                        updateAttribute({
+                          condition: e.target.value || undefined,
+                        })
+                      }
+                      placeholder="Optional RegEx condition"
+                    />
+                  </div>
+
+                  {/* Probability field */}
+                  <div className="space-y-2">
+                    <Label>Probability (optional)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={attribute.probability ?? ""}
+                      onChange={(e) =>
+                        updateAttribute({
+                          probability: e.target.value
+                            ? parseFloat(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      placeholder="0.0 - 1.0 (leave empty for always)"
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
