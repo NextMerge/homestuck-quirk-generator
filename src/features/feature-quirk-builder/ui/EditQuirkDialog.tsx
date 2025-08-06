@@ -25,6 +25,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Trash2Icon,
   ChevronUpIcon,
   ChevronDownIcon,
@@ -32,71 +38,7 @@ import {
 } from "lucide-react";
 import type { Quirk } from "../utilities/quirk";
 
-// Import canon quirks for presets
-import { alterniaQuirks } from "../../feature-canon-quirks/data/alternia";
-import { beforusQuirks } from "../../feature-canon-quirks/data/beforus";
-import { cherubsQuirks } from "../../feature-canon-quirks/data/cherubs";
-import { hiveswapQuirks } from "../../feature-canon-quirks/data/hiveswap";
-import { spritesQuirks } from "../../feature-canon-quirks/data/sprites";
-
-type QuirkAttribute =
-  | {
-      type: "simple";
-      match: string;
-      replacement: string;
-      caseSensitive?: boolean;
-      condition?: string;
-      probability?: number;
-    }
-  | {
-      type: "word";
-      match: string;
-      replacement: string;
-      caseSensitive?: boolean;
-      condition?: string;
-      probability?: number;
-    }
-  | {
-      type: "wordMatchCase";
-      match: string;
-      replacement: string;
-      condition?: string;
-      probability?: number;
-    }
-  | {
-      type: "matchCase";
-      match: string;
-      replacement: string;
-      condition?: string;
-      probability?: number;
-    }
-  | {
-      type: "regex";
-      match: string;
-      replacement: string;
-      applyProbabilityToEachMatch?: boolean;
-      caseSensitive?: boolean;
-      condition?: string;
-      probability?: number;
-    }
-  | { type: "prefix"; text: string; condition?: string; probability?: number }
-  | { type: "suffix"; text: string; condition?: string; probability?: number }
-  | {
-      type: "emoticon";
-      replacementEyes: string;
-      replacementSmile: string;
-      replacementFrown: string;
-      condition?: string;
-      probability?: number;
-    }
-  | {
-      type: "random";
-      match: string;
-      replacements: string[];
-      caseSensitive?: boolean;
-      condition?: string;
-      probability?: number;
-    };
+type QuirkAttribute = Quirk["attributes"][number];
 
 type EditQuirkFormData = {
   name: string;
@@ -125,23 +67,17 @@ const attributeTypeLabels = {
 
 const attributeDescriptions = {
   simple: "Replace any occurrence of text",
-  word: "Replace whole words only",
-  wordMatchCase: "Replace whole words, preserving case",
-  matchCase: "Replace text, preserving case",
-  regex: "Replace using regular expressions",
+  word: "Will match the characters provided so long as they are surrounded by word boundaries (spaces, commas, periods, quotes).",
+  wordMatchCase:
+    "Replace whole words, preserving case. Example: foo → bar would match 'foo' → 'bar', 'Foo' → 'Bar', 'FOO' → 'BAR'.",
+  matchCase:
+    "Replace text, preserving case. Example: foo → bar would match 'foo' → 'bar', 'Foo' → 'Bar', 'FOO' → 'BAR'.",
+  regex:
+    "Replace using regular expressions. Take a look at the preset quirks to see examples of how to use this",
   prefix: "Add text to the beginning",
   suffix: "Add text to the end",
   emoticon: "Replace emoticons with custom text",
   random: "Randomly replace with one of multiple options",
-} as const;
-
-// Group quirks by series for better organization
-const canonQuirksByGroup = {
-  Alternia: alterniaQuirks,
-  Beforus: beforusQuirks,
-  Cherubs: cherubsQuirks,
-  Hiveswap: hiveswapQuirks,
-  Sprites: spritesQuirks,
 } as const;
 
 function AttributeForm({
@@ -172,12 +108,14 @@ function AttributeForm({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h4 className="font-medium">{attributeTypeLabels[attribute.type]}</h4>
-          <div className="group relative">
-            <HelpCircleIcon className="h-4 w-4 text-gray-400" />
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-              {attributeDescriptions[attribute.type]}
-            </div>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{attributeDescriptions[attribute.type]}</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <div className="flex items-center gap-1">
           <Button
@@ -263,7 +201,7 @@ function AttributeForm({
             value={attribute.replacements.join("\n")}
             onChange={(e) =>
               updateAttribute({
-                replacements: e.target.value.split("\n").filter(Boolean),
+                replacements: e.target.value.split("\n"),
               })
             }
             placeholder="One replacement option per line"
@@ -325,34 +263,27 @@ function AttributeForm({
         </div>
       )}
 
-      {/* Regex specific options */}
-      {attribute.type === "regex" && (
-        <div className="flex items-center space-x-2">
-          <Switch
-            checked={attribute.applyProbabilityToEachMatch || false}
-            onCheckedChange={(checked) =>
-              updateAttribute({ applyProbabilityToEachMatch: checked })
-            }
-          />
-          <Label>Apply Probability to Each Match</Label>
-        </div>
-      )}
-
       {/* Condition field for all types */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Label>Condition (optional)</Label>
-          <div className="group relative">
-            <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded max-w-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50">
-              RegEx pattern which will only perform this attribute if the
-              inputted text matches it. If left blank the attribute will always
-              run. Note that this condition only runs once and not for every
-              match. Use the{" "}
-              <code className="bg-gray-600 px-1 rounded">Random</code> attribute
-              instead to run a condition on each match.
-            </div>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-sm">
+              <p>
+                RegEx pattern which will only perform this attribute if the
+                inputted text matches it. If left blank the attribute will
+                always run. Note that this condition only runs once and not for
+                every match. Use the{" "}
+                <code className="bg-gray-800 text-gray-200 px-1 rounded">
+                  Random
+                </code>{" "}
+                attribute instead to run a condition on each match.
+              </p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <Input
           value={attribute.condition || ""}
@@ -371,7 +302,7 @@ function AttributeForm({
           min="0"
           max="1"
           step="0.1"
-          value={attribute.probability || ""}
+          value={attribute.probability ?? ""}
           onChange={(e) =>
             updateAttribute({
               probability: e.target.value
@@ -436,9 +367,9 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
         case "emoticon":
           return {
             type,
-            replacementEyes: ":",
-            replacementSmile: ")",
-            replacementFrown: "(",
+            replacementEyes: "",
+            replacementSmile: "",
+            replacementFrown: "",
           };
         case "random":
           return { type, match: "", replacements: [] };
@@ -480,248 +411,209 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-        <form
-          autoComplete="off"
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
+    <TooltipProvider>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent
+          className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto"
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <DialogHeader>
-            <DialogTitle>Edit Quirk</DialogTitle>
-            <DialogDescription>
-              Customize your quirk's properties and text transformation rules.
-            </DialogDescription>
-          </DialogHeader>
+          <form
+            autoComplete="off"
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Edit Quirk</DialogTitle>
+              <DialogDescription>
+                Customize your quirk's properties and text transformation rules.
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="grid gap-6 py-4">
-            {/* Basic Properties */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Basic Properties</h3>
+            <div className="grid gap-6 py-4">
+              {/* Basic Properties */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Basic Properties</h3>
 
-              <form.Field
-                name="name"
-                validators={{
-                  onChange: ({ value }) => {
-                    if (!value || value.trim() === "") {
-                      return "Quirk name is required";
-                    }
-                    if (value.trim().length < 2) {
-                      return "Quirk name must be at least 2 characters";
-                    }
-                    return undefined;
-                  },
-                }}
-              >
-                {(field) => (
-                  <div className="space-y-2">
-                    <Label htmlFor={field.name}>Name*</Label>
-                    <Input
-                      id={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="Quirk name"
-                      className={
-                        field.state.meta.errors.length > 0
-                          ? "border-red-500"
-                          : ""
+                <form.Field
+                  name="name"
+                  validators={{
+                    onChange: ({ value }) => {
+                      if (!value || value.trim() === "") {
+                        return "Quirk name is required";
                       }
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <div className="text-red-500 text-sm">
-                        {field.state.meta.errors[0]}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="description">
-                {(field) => (
-                  <div className="space-y-2">
-                    <Label htmlFor={field.name}>Description</Label>
-                    <Textarea
-                      id={field.name}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="Optional description"
-                      rows={2}
-                    />
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="color">
-                {(field) => (
-                  <div className="space-y-2">
-                    <Label htmlFor={field.name}>Color</Label>
-                    <div className="flex items-center gap-2">
+                      if (value.trim().length < 2) {
+                        return "Quirk name must be at least 2 characters";
+                      }
+                      return undefined;
+                    },
+                  }}
+                >
+                  {(field) => (
+                    <div className="space-y-2">
+                      <Label htmlFor={field.name}>Name*</Label>
                       <Input
-                        type="color"
+                        autoComplete="off"
+                        id={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="Quirk name"
+                        className={
+                          field.state.meta.errors.length > 0
+                            ? "border-red-500"
+                            : ""
+                        }
+                      />
+                      {field.state.meta.errors.length > 0 && (
+                        <div className="text-red-500 text-sm">
+                          {field.state.meta.errors[0]}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="description">
+                  {(field) => (
+                    <div className="space-y-2">
+                      <Label htmlFor={field.name}>Description</Label>
+                      <Textarea
                         id={field.name}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
-                        className="w-12 h-10"
-                      />
-                      <Input
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="#6366f1"
-                        pattern="^#[0-9A-Fa-f]{6}$"
+                        placeholder="Optional description"
+                        rows={2}
                       />
                     </div>
-                  </div>
-                )}
-              </form.Field>
-            </div>
+                  )}
+                </form.Field>
 
-            <Separator />
-
-            {/* Attributes */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-medium">
-                    Text Transformation Rules
-                  </h3>
-                  <div className="group relative">
-                    <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded max-w-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal z-50">
-                      Most quirks can probably be easily created with RegEx
-                      patterns, but they can be a little tricky to understand.
-                      Some presets are provided below as a starting point, but
-                      if you're ever stuck you can likely ask an AI chatbot to
-                      make the pattern for you.
+                <form.Field name="color">
+                  {(field) => (
+                    <div className="space-y-2">
+                      <Label htmlFor={field.name}>Color</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="color"
+                          id={field.name}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="w-12 h-10"
+                        />
+                        <Input
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="#6366f1"
+                          pattern="^#[0-9A-Fa-f]{6}$"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Select
-                    onValueChange={(value) => {
-                      if (value) {
-                        addAttribute(value as QuirkAttribute["type"]);
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Add Rule..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(attributeTypeLabels).map(
-                        ([type, label]) => (
-                          <SelectItem key={type} value={type}>
-                            {label}
-                          </SelectItem>
-                        ),
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
+                  )}
+                </form.Field>
               </div>
 
-              {attributes.length === 0 ? (
-                <div className="space-y-6">
-                  <div className="text-center py-4 text-gray-500">
+              <Separator />
+
+              {/* Attributes */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-medium">
+                      Text Transformation Rules
+                    </h3>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-md">
+                        <p>
+                          Most quirks can probably be easily created with RegEx
+                          patterns, but they can be a little tricky to
+                          understand. Some presets are provided below as a
+                          starting point, but if you're ever stuck you can
+                          likely ask an AI chatbot to make the pattern for you.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      onValueChange={(value) => {
+                        if (value) {
+                          addAttribute(value as QuirkAttribute["type"]);
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Add Rule..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(attributeTypeLabels).map(
+                          ([type, label]) => (
+                            <SelectItem key={type} value={type}>
+                              {label}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {attributes.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
                     <p>No transformation rules yet</p>
                     <p className="text-sm">
-                      Add a rule using the dropdown above, or pick a preset
-                      below
+                      Add a rule using the dropdown above
                     </p>
                   </div>
-
-                  {/* Canon Quirk Presets */}
+                ) : (
                   <div className="space-y-4">
-                    <h4 className="font-medium text-sm text-gray-700">
-                      Pick a Canon Quirk Preset:
-                    </h4>
-                    <div className="space-y-3">
-                      {Object.entries(canonQuirksByGroup).map(
-                        ([groupName, quirks]) => (
-                          <div key={groupName} className="space-y-2">
-                            <h5 className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                              {groupName}
-                            </h5>
-                            <div className="grid grid-cols-2 gap-2">
-                              {quirks.map((canonQuirk) => (
-                                <Button
-                                  key={canonQuirk.id}
-                                  variant="outline"
-                                  size="sm"
-                                  className="justify-start text-left h-auto py-2 px-3"
-                                  onClick={() => {
-                                    setAttributes(canonQuirk.attributes);
-                                    form.setFieldValue("name", canonQuirk.name);
-                                    form.setFieldValue(
-                                      "color",
-                                      canonQuirk.color,
-                                    );
-                                  }}
-                                >
-                                  <div className="flex items-center gap-2 w-full">
-                                    <div
-                                      className="w-3 h-3 rounded-full border flex-shrink-0"
-                                      style={{
-                                        backgroundColor: canonQuirk.color,
-                                      }}
-                                    />
-                                    <span className="text-xs truncate">
-                                      {canonQuirk.name}
-                                    </span>
-                                  </div>
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
-                        ),
-                      )}
-                    </div>
+                    {attributes.map(
+                      (attribute: QuirkAttribute, index: number) => (
+                        <AttributeForm
+                          key={`${attribute.type}-${index}`}
+                          attribute={attribute}
+                          onChange={(updated) =>
+                            updateAttribute(index, updated)
+                          }
+                          onDelete={() => deleteAttribute(index)}
+                          onMoveUp={() => moveAttribute(index, "up")}
+                          onMoveDown={() => moveAttribute(index, "down")}
+                          canMoveUp={index > 0}
+                          canMoveDown={index < attributes.length - 1}
+                        />
+                      ),
+                    )}
                   </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {attributes.map(
-                    (attribute: QuirkAttribute, index: number) => (
-                      <AttributeForm
-                        key={`${attribute.type}-${index}`}
-                        attribute={attribute}
-                        onChange={(updated) => updateAttribute(index, updated)}
-                        onDelete={() => deleteAttribute(index)}
-                        onMoveUp={() => moveAttribute(index, "up")}
-                        onMoveDown={() => moveAttribute(index, "down")}
-                        canMoveUp={index > 0}
-                        canMoveDown={index < attributes.length - 1}
-                      />
-                    ),
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-            >
-              {([canSubmit, isSubmitting]) => (
-                <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                  {isSubmitting ? "Saving..." : "Save Changes"}
-                </Button>
-              )}
-            </form.Subscribe>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <form.Subscribe
+                selector={(state) => [state.canSubmit, state.isSubmitting]}
+              >
+                {([canSubmit, isSubmitting]) => (
+                  <Button type="submit" disabled={!canSubmit || isSubmitting}>
+                    {isSubmitting ? "Saving..." : "Save Changes"}
+                  </Button>
+                )}
+              </form.Subscribe>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </TooltipProvider>
   );
 }
