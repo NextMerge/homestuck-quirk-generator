@@ -51,3 +51,10 @@ June 2022
 - Rewrote Quirks to use a more robust system
 - Restructured UI to eliminate the side bar and give each quirk its own card with their options
 - Moved hosting to Firebase
+
+## 6.0
+
+August 2025
+
+- Rewrote entire site (again)
+- Added the ability to create your own quirks
