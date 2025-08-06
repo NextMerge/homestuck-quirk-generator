@@ -43,6 +43,7 @@ export function CollectionViewer(props: Props) {
   const [editingId, setEditingId] = useState<Id<"collections"> | null>(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [nameError, setNameError] = useState("");
 
   if (data === undefined) {
     return <div>Loading...</div>;
@@ -88,18 +89,49 @@ export function CollectionViewer(props: Props) {
     setEditingId(collection._id);
     setEditName(collection.name);
     setEditDescription(collection.description);
+    setNameError("");
   };
 
   const handleSave = async (collectionId: Id<"collections">) => {
+    // Get the current collection to check if name actually changed
+    const currentCollection = data.collections.find(
+      (c) => c._id === collectionId,
+    );
+    if (!currentCollection) return;
+
+    // Check for name conflicts only if the name actually changed
+    if (editName !== currentCollection.name) {
+      const nameExists = data.collections.some(
+        (collection) =>
+          (collection._id !== collectionId &&
+            collection.name.toLowerCase() === editName.trim().toLowerCase()) ||
+          convertToSlug(collection.name) === convertToSlug(editName.trim()),
+      );
+
+      if (nameExists) {
+        setNameError(
+          `A collection named "${editName}" already exists. Please choose a different name.`,
+        );
+        return;
+      }
+
+      if (editName.trim() === "") {
+        setNameError("Collection name cannot be empty.");
+        return;
+      }
+    }
+
     try {
       await updateCollection({
         collectionId,
-        name: editName,
-        description: editDescription,
+        name: editName.trim(),
+        description: editDescription.trim(),
       });
       setEditingId(null);
+      setNameError("");
     } catch (error) {
       console.error("Failed to update collection:", error);
+      setNameError("Failed to update collection. Please try again.");
     }
   };
 
@@ -107,6 +139,36 @@ export function CollectionViewer(props: Props) {
     setEditingId(null);
     setEditName("");
     setEditDescription("");
+    setNameError("");
+  };
+
+  const handleNameChange = (value: string, collectionId: Id<"collections">) => {
+    setEditName(value);
+
+    // Real-time validation
+    if (value.trim() === "") {
+      setNameError("Collection name cannot be empty.");
+      return;
+    }
+
+    const currentCollection = data.collections.find(
+      (c) => c._id === collectionId,
+    );
+    if (currentCollection && value !== currentCollection.name) {
+      const nameExists = data.collections.some(
+        (collection) =>
+          collection._id !== collectionId &&
+          (collection.name.toLowerCase() === value.toLowerCase() ||
+            convertToSlug(collection.name) === convertToSlug(value)),
+      );
+
+      if (nameExists) {
+        setNameError(`A collection named "${value}" already exists.`);
+        return;
+      }
+    }
+
+    setNameError("");
   };
 
   return (
@@ -136,13 +198,20 @@ export function CollectionViewer(props: Props) {
                     {editingId === collection._id ? (
                       // Editing mode
                       <div className="space-y-3">
-                        <Input
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          placeholder="Collection name"
-                          className="text-lg font-semibold"
-                          autoFocus
-                        />
+                        <div className="space-y-1">
+                          <Input
+                            value={editName}
+                            onChange={(e) =>
+                              handleNameChange(e.target.value, collection._id)
+                            }
+                            placeholder="Collection name"
+                            className={`text-lg font-semibold ${nameError ? "border-red-500 focus:border-red-500" : ""}`}
+                            autoFocus
+                          />
+                          {nameError && (
+                            <p className="text-red-500 text-xs">{nameError}</p>
+                          )}
+                        </div>
                         <Textarea
                           value={editDescription}
                           onChange={(e) => setEditDescription(e.target.value)}
@@ -184,8 +253,10 @@ export function CollectionViewer(props: Props) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50 disabled:text-gray-400 disabled:hover:text-gray-400 disabled:hover:bg-transparent"
                             onClick={() => handleSave(collection._id)}
+                            disabled={!!nameError}
+                            title={nameError || "Save changes"}
                           >
                             <Check className="w-4 h-4" />
                           </Button>
