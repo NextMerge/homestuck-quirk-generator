@@ -46,13 +46,13 @@ export const Route = createRootRoute({
             <Header />
 
             <main className="flex-1">
-              <div className="mx-auto max-w-[1600px]">
+              <div className="mx-auto max-w-container px-container">
                 <Outlet />
               </div>
             </main>
 
             <footer className="bg-gray-900 border-t border-gray-800 py-4">
-              <div className="mx-auto max-w-[1600px] px-4">
+              <div className="mx-auto max-w-container px-container">
                 <div className="text-center text-gray-400 text-sm">
                   Made with ❤ by someone •{" "}
                   <a

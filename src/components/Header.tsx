@@ -1,6 +1,7 @@
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Authenticated, Unauthenticated } from "convex/react";
+import { Button } from "./ui/button";
 
 export default function Header() {
   const location = useLocation();
@@ -9,7 +10,7 @@ export default function Header() {
 
   return (
     <div className="bg-gray-900 border-b border-gray-800">
-      <header className="mx-auto flex max-w-[1600px] justify-between items-center gap-4 px-4 py-4 text-white">
+      <header className="mx-auto px-container flex max-w-container justify-between items-center gap-4 h-12 text-white">
         <nav className="flex flex-row items-center gap-6">
           <div className="font-bold text-lg">
             <Link to="/" className="hover:text-gray-300 transition-colors">
@@ -52,7 +53,7 @@ export default function Header() {
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "w-8 h-8",
+                  avatarBox: "w-8 h-8 ",
                   userButtonPopoverCard: "bg-gray-800 border-gray-700",
                   userButtonPopoverActionButton:
                     "text-gray-300 hover:bg-gray-700",
@@ -62,12 +63,7 @@ export default function Header() {
           </Authenticated>
           <Unauthenticated>
             <SignInButton>
-              <button
-                type="button"
-                className="hover:bg-blue-700 text-white rounded-md transition-colors"
-              >
-                Sign In
-              </button>
+              <Button variant="ghost">Sign In</Button>
             </SignInButton>
           </Unauthenticated>
         </div>

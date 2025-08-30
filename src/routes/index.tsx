@@ -50,7 +50,7 @@ function App() {
 
   return (
     <QuirkProvider>
-      <main className="space-y-6 p-6">
+      <main className="space-y-6 py-6">
         <CanonQuirksHeader
           selectedPreset={selectedPreset}
           setSelectedPreset={setSelectedPreset}

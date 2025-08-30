@@ -16,7 +16,7 @@ function RouteComponent() {
   }
 
   return (
-    <main className="py-6 mx-6">
+    <main className="py-6">
       {collection === undefined ? (
         <CollectionViewer usernameSlug={user} />
       ) : (
