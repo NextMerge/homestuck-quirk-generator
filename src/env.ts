@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    CLERK_FRONTEND_API_URL: z.string().url(),
+    CLERK_FRONTEND_API_URL: z.url(),
     // CONVEX_DEPLOYMENT: z.string(),
     CLERK_WEBHOOK_SECRET: z.string(),
   },
@@ -16,7 +16,7 @@ export const env = createEnv({
 
   client: {
     VITE_CLERK_PUBLISHABLE_KEY: z.string(),
-    VITE_CONVEX_URL: z.string().url(),
+    VITE_CONVEX_URL: z.url(),
   },
 
   /**
