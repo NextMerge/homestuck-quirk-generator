@@ -2,9 +2,9 @@ name: Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -17,12 +17,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: '10.13.1'
+          version: "10.13.1"
 
       - name: Get pnpm store directory
         shell: bash
@@ -42,12 +42,9 @@ jobs:
 
       - name: Run tests
         run: pnpm test
-        
+
       - name: Type check
         run: pnpm exec tsc --noEmit
-      
+
       - name: Build
         run: pnpm build
-
-      - name: Deploy Convex
-        run: pnpm exec convex deploy
