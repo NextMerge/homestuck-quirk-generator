@@ -8,7 +8,6 @@ import {
   ChevronUpIcon,
   EditIcon,
   ExternalLink,
-  PlusIcon,
   Trash2Icon,
   X,
 } from "lucide-react";
