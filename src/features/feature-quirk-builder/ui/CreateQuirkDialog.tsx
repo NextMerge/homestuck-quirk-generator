@@ -1,18 +1,15 @@
-import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
-import type { Id } from "../../../../convex/_generated/dataModel";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,6 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 // Import canon quirks
 import { alterniaQuirks } from "../../feature-canon-quirks/data/alternia";
@@ -73,7 +73,7 @@ export default function CreateQuirkDialog({
     defaultValues: {
       name: "",
       description: "",
-      color: "#000000",
+      color: "#FFFFFF",
     },
     onSubmit: async ({ value }) => {
       let quirkData = {
@@ -304,6 +304,8 @@ export default function CreateQuirkDialog({
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         placeholder="Enter quirk name"
+                        autoComplete="off"
+                        data-1p-ignore
                       />
                       {field.state.meta.errors.length > 0 && (
                         <p className="text-sm text-destructive">
@@ -348,7 +350,7 @@ export default function CreateQuirkDialog({
                         <Input
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="#000000"
+                          placeholder="#FFFFFF"
                           className="font-mono"
                         />
                       </div>

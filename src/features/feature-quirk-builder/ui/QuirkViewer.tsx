@@ -1,17 +1,17 @@
-import { useState } from "react";
 import { api } from "convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
 import type { Id } from "convex/_generated/dataModel";
+import { QUIRK_COUNT_MAX } from "convex/limits";
+import { useMutation, useQuery } from "convex/react";
+import { PlusIcon } from "lucide-react";
+import { useId, useState } from "react";
 import { Tile } from "@/components/Tile";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { PlusIcon } from "lucide-react";
-import { QuirkTable } from "./QuirkTable";
-import { phrase, QuirkProvider, useQuirkContext } from "./QuirkContext";
-import CreateQuirkDialog from "./CreateQuirkDialog";
+import { Textarea } from "@/components/ui/textarea";
 import type { Quirk } from "../utilities/quirk";
-import { QUIRK_COUNT_MAX } from "convex/limits";
+import CreateQuirkDialog from "./CreateQuirkDialog";
+import { phrase, QuirkProvider, useQuirkContext } from "./QuirkContext";
+import { QuirkTable } from "./QuirkTable";
 
 type Props = {
   usernameSlug: string;
@@ -34,6 +34,7 @@ function QuirkViewerHeader({
   quirkCount,
 }: QuirkViewerHeaderProps) {
   const { inputText, setInputText } = useQuirkContext();
+  const inputTextFieldId = useId();
 
   return (
     <Tile>
@@ -46,12 +47,11 @@ function QuirkViewerHeader({
           )}
         </div>
 
-        {/* Test Text Input and Add Quirk Button */}
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 md:items-start">
           <div className="flex-1 space-y-2">
-            <Label htmlFor="input-text">Test Text</Label>
+            <Label htmlFor={inputTextFieldId}>Input Text</Label>
             <Textarea
-              id="input-text"
+              id={inputTextFieldId}
               value={inputText}
               onFocus={() => {
                 if (inputText === phrase && !isOwner) {

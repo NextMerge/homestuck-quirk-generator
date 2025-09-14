@@ -1,25 +1,26 @@
-import { useState } from "react";
-import { api } from "convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
 import { Link } from "@tanstack/react-router";
+import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
+import {
+  Check,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  EditIcon,
+  ExternalLink,
+  PlusIcon,
+  Trash2Icon,
+  X,
+} from "lucide-react";
+import { useState } from "react";
 import { Tile } from "@/components/Tile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { convertToSlug } from "@/lib/slugify";
 import { CreateCollectionDialog } from "./CreateCollectionDialog";
 import { DeleteCollectionDialog } from "./DeleteCollectionDialog";
-import { convertToSlug } from "@/lib/slugify";
-import {
-  EditIcon,
-  Trash2Icon,
-  ChevronUpIcon,
-  ChevronDownIcon,
-  Check,
-  X,
-  ExternalLink,
-} from "lucide-react";
 
 type Collection = {
   _id: Id<"collections">;
@@ -149,7 +150,6 @@ export function CollectionViewer(props: Props) {
   const handleNameChange = (value: string, collectionId: Id<"collections">) => {
     setEditName(value);
 
-    // Real-time validation
     if (value.trim() === "") {
       setNameError("Collection name cannot be empty.");
       return;
@@ -190,7 +190,7 @@ export function CollectionViewer(props: Props) {
         {data.collections.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             {data.collectionBelongsToUser
-              ? "No collections yet. Create your first collection!"
+              ? "No collections yet. Use the button above to create your first collection!"
               : "No collections found."}
           </div>
         ) : (
@@ -200,7 +200,6 @@ export function CollectionViewer(props: Props) {
                 <div className="flex items-start justify-between p-4 gap-4">
                   <div className="flex-1 min-w-0">
                     {editingId === collection._id ? (
-                      // Editing mode
                       <div className="space-y-3">
                         <div className="space-y-1">
                           <Input
@@ -225,7 +224,6 @@ export function CollectionViewer(props: Props) {
                         />
                       </div>
                     ) : (
-                      // Display mode
                       <div>
                         <Link
                           to="/q/{$user}/{-$collection}"
@@ -274,7 +272,6 @@ export function CollectionViewer(props: Props) {
                           </Button>
                         </>
                       ) : (
-                        // Normal actions
                         <>
                           <Button
                             variant="ghost"

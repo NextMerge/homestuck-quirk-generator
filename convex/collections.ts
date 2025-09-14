@@ -1,23 +1,26 @@
 import { v } from "convex/values";
+import { convertToSlug } from "@/lib/slugify";
 import { mutation, query } from "./_generated/server";
 import { COLLECTION_COUNT_MAX } from "./limits";
-import { convertToSlug } from "@/lib/slugify";
 
 export const list = query({
   args: {
     usernameSlug: v.string(),
   },
-  returns: v.union(v.object({
-    collections: v.array(
-      v.object({
-        _id: v.id("collections"),
-        name: v.string(),
-        description: v.string(),
-        order: v.number(),
-      }),
-    ),
-    collectionBelongsToUser: v.boolean(),
-  }), v.null()),
+  returns: v.union(
+    v.object({
+      collections: v.array(
+        v.object({
+          _id: v.id("collections"),
+          name: v.string(),
+          description: v.string(),
+          order: v.number(),
+        }),
+      ),
+      collectionBelongsToUser: v.boolean(),
+    }),
+    v.null(),
+  ),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
@@ -75,14 +78,14 @@ export const get = query({
       .collect();
 
     // Find collection by matching slug
-    const collection = collections.find(c => 
-      convertToSlug(c.name) === args.collectionSlug
+    const collection = collections.find(
+      (c) => convertToSlug(c.name) === args.collectionSlug,
     );
 
     if (!collection) {
       return null;
     }
-    
+
     const quirks = await ctx.db
       .query("quirks")
       .withIndex("by_collection_and_order", (q) =>
@@ -119,7 +122,13 @@ export const create = mutation({
       .withIndex("by_user", (q) => q.eq("userId", identity.subject))
       .collect();
 
-    if (existingCollections.some((c) => c.name === args.name.trim().toLowerCase() || convertToSlug(c.name) === convertToSlug(args.name))) {
+    if (
+      existingCollections.some(
+        (c) =>
+          c.name === args.name.trim().toLowerCase() ||
+          convertToSlug(c.name) === convertToSlug(args.name),
+      )
+    ) {
       throw new Error("Collection with this name already exists");
     }
 
@@ -239,7 +248,13 @@ export const update = mutation({
         .withIndex("by_user", (q) => q.eq("userId", identity.subject))
         .collect();
 
-      if (existingCollections.some((c) => c.name === args.name?.trim().toLowerCase() || convertToSlug(c.name) === convertToSlug(args.name ?? ""))) {
+      if (
+        existingCollections.some(
+          (c) =>
+            c.name === args.name?.trim().toLowerCase() ||
+            convertToSlug(c.name) === convertToSlug(args.name ?? ""),
+        )
+      ) {
         throw new Error("Collection with this name already exists");
       }
 

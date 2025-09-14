@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
 import {
@@ -33,10 +34,11 @@ export function DeleteCollectionDialog({
     try {
       setIsDeleting(true);
       await deleteCollection({ collectionId });
+      toast.success("Collection deleted successfully!");
       setOpen(false);
     } catch (error) {
       console.error("Failed to delete collection:", error);
-      // Handle error - could show toast or error message
+      toast.error("Failed to delete collection. Please try again.");
     } finally {
       setIsDeleting(false);
     }

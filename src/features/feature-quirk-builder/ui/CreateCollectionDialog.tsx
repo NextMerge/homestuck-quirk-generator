@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "convex/_generated/api";
 import {
   Dialog,
@@ -19,11 +20,6 @@ import { PlusIcon } from "lucide-react";
 import { COLLECTION_COUNT_MAX, NAME_MAX_LENGTH } from "convex/limits";
 import { convertToSlug } from "@/lib/slugify";
 
-type CreateCollectionFormData = {
-  name: string;
-  description: string;
-};
-
 type Props = {
   existingCollectionNames: string[];
 };
@@ -34,20 +30,21 @@ export function CreateCollectionDialog({ existingCollectionNames }: Props) {
 
   const form = useForm({
     defaultValues: {
-      name: "",
+      collectionName: "",
       description: "",
     },
-    onSubmit: async ({ value }: { value: CreateCollectionFormData }) => {
+    onSubmit: async ({ value }) => {
       try {
         await createCollection({
-          name: value.name,
+          name: value.collectionName,
           description: value.description,
         });
+        toast.success("Collection created successfully!");
         setOpen(false);
         form.reset();
       } catch (error) {
         console.error("Failed to create collection:", error);
-        // Handle error - could show toast or form error
+        toast.error("Failed to create collection. Please try again.");
       }
     },
   });
@@ -89,7 +86,7 @@ export function CreateCollectionDialog({ existingCollectionNames }: Props) {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <form.Field
-              name="name"
+              name="collectionName"
               validators={{
                 onChange: ({ value }) => {
                   if (!value || value.trim() === "") {
@@ -138,6 +135,7 @@ export function CreateCollectionDialog({ existingCollectionNames }: Props) {
                           : ""
                       }
                       autoComplete="off"
+                      data-1p-ignore
                     />
                     {field.state.meta.errors.length > 0 && (
                       <div className="text-red-500 text-sm mt-1">
