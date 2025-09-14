@@ -79,6 +79,32 @@ export type Quirk = {
   attributes: QuirkAttribute[];
 };
 
+/**
+ * Safely validates if a regex pattern is valid
+ */
+export function isValidRegex(pattern: string): boolean {
+  try {
+    new RegExp(pattern);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Safely creates a RegExp, returning null if invalid
+ */
+export function createSafeRegex(
+  pattern: string,
+  flags?: string,
+): RegExp | null {
+  try {
+    return new RegExp(pattern, flags);
+  } catch {
+    return null;
+  }
+}
+
 export function replace(params: {
   text: string;
   char: string;
@@ -211,16 +237,24 @@ export function replaceRegex(params: {
   caseSensitive: boolean;
   probability: number;
 }) {
-  const tempLeftParenthesis = "“";
-  const tempRightParenthesis = "”";
+  // Check if regex is valid first
+  const regex = createSafeRegex(
+    params.regex,
+    params.caseSensitive ? "g" : "gi",
+  );
+  if (!regex) {
+    // If regex is invalid, return the original text unchanged
+    console.warn(`Invalid regex pattern: ${params.regex}`);
+    return params.text;
+  }
+
+  const tempLeftParenthesis = "\u201c";
+  const tempRightParenthesis = "\u201d";
 
   return params.text
     .replace(/\(/g, tempLeftParenthesis)
     .replace(/\)/g, tempRightParenthesis)
-    .replace(
-      new RegExp(params.regex, params.caseSensitive ? "g" : "gi"),
-      params.replacement,
-    )
+    .replace(regex, params.replacement)
     .replace(/upper\((.*?)\)/g, (_: string, p1: string) => p1.toUpperCase())
     .replace(/lower\((.*?)\)/g, (_: string, p1: string) => p1.toLowerCase())
     .replace(/oddCase\((.*?)\)/g, (_: string, p1: string) => {
@@ -296,20 +330,30 @@ function replaceRandom(params: {
   caseSensitive: boolean;
   probability: number;
 }) {
-  return params.text.replace(
-    new RegExp(params.match, params.caseSensitive ? "g" : "gi"),
-    (match) => {
-      const mathRandom = Math.random();
-      if (mathRandom > params.probability) {
-        return match;
-      }
-      return (
-        params.replacements[
-          Math.floor(mathRandom * params.replacements.length)
-        ]?.replace("$1", match) ?? ""
-      );
-    },
+  // Check if regex is valid first
+  const regex = createSafeRegex(
+    params.match,
+    params.caseSensitive ? "g" : "gi",
   );
+  if (!regex) {
+    // If regex is invalid, return the original text unchanged
+    console.warn(
+      `Invalid regex pattern in random replacement: ${params.match}`,
+    );
+    return params.text;
+  }
+
+  return params.text.replace(regex, (match) => {
+    const mathRandom = Math.random();
+    if (mathRandom > params.probability) {
+      return match;
+    }
+    return (
+      params.replacements[
+        Math.floor(mathRandom * params.replacements.length)
+      ]?.replace("$1", match) ?? ""
+    );
+  });
 }
 
 export function applyQuirk(params: { quirk: Quirk; text: string }) {
@@ -323,8 +367,16 @@ export function applyQuirk(params: { quirk: Quirk; text: string }) {
       return acc;
     }
 
-    if (attribute.condition && !new RegExp(attribute.condition).test(acc)) {
-      return acc;
+    // Check condition with safe regex
+    if (attribute.condition) {
+      const conditionRegex = createSafeRegex(attribute.condition);
+      if (!conditionRegex) {
+        console.warn(`Invalid regex in condition: ${attribute.condition}`);
+        return acc;
+      }
+      if (!conditionRegex.test(acc)) {
+        return acc;
+      }
     }
 
     switch (attribute.type) {

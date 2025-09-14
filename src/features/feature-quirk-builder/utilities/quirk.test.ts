@@ -1,5 +1,103 @@
 import { describe, expect, it } from "vitest";
-import { replace, replaceWord, replaceWordMatchCase } from "./quirk";
+import {
+  replace,
+  replaceWord,
+  replaceWordMatchCase,
+  isValidRegex,
+  createSafeRegex,
+  applyQuirk,
+  type Quirk,
+} from "./quirk";
+
+describe("isValidRegex", () => {
+  it("should return true for valid regex patterns", () => {
+    expect(isValidRegex("hello")).toBe(true);
+    expect(isValidRegex("[a-z]+")).toBe(true);
+    expect(isValidRegex("\\d+")).toBe(true);
+    expect(isValidRegex(".*")).toBe(true);
+  });
+
+  it("should return false for invalid regex patterns", () => {
+    expect(isValidRegex("(unclosed")).toBe(false);
+    expect(isValidRegex("[unclosed")).toBe(false);
+    expect(isValidRegex("*")).toBe(false);
+    expect(isValidRegex("?")).toBe(false);
+  });
+});
+
+describe("createSafeRegex", () => {
+  it("should return RegExp for valid patterns", () => {
+    const regex = createSafeRegex("hello", "gi");
+    expect(regex).toBeInstanceOf(RegExp);
+    expect(regex?.source).toBe("hello");
+  });
+
+  it("should return null for invalid patterns", () => {
+    expect(createSafeRegex("(unclosed")).toBe(null);
+    expect(createSafeRegex("[unclosed")).toBe(null);
+  });
+});
+
+describe("applyQuirk with invalid regex", () => {
+  it("should not crash with invalid regex patterns", () => {
+    const quirk: Quirk = {
+      id: "test",
+      name: "Test Quirk",
+      color: "#000000",
+      attributes: [
+        {
+          type: "regex",
+          match: "(unclosed", // Invalid regex
+          replacement: "replacement",
+        },
+      ],
+    };
+
+    // This should not crash
+    const result = applyQuirk({ quirk, text: "test text" });
+    expect(result).toBe("test text"); // Original text should be unchanged
+  });
+
+  it("should not crash with invalid condition regex", () => {
+    const quirk: Quirk = {
+      id: "test",
+      name: "Test Quirk",
+      color: "#000000",
+      attributes: [
+        {
+          type: "simple",
+          match: "e",
+          replacement: "3",
+          condition: "[unclosed", // Invalid condition regex
+        },
+      ],
+    };
+
+    // This should not crash
+    const result = applyQuirk({ quirk, text: "test text" });
+    expect(result).toBe("test text"); // Original text should be unchanged due to invalid condition
+  });
+
+  it("should not crash with invalid random regex", () => {
+    const quirk: Quirk = {
+      id: "test",
+      name: "Test Quirk",
+      color: "#000000",
+      attributes: [
+        {
+          type: "random",
+          match: "*invalid", // Invalid regex
+          replacements: ["a", "b", "c"],
+          probability: 1,
+        },
+      ],
+    };
+
+    // This should not crash
+    const result = applyQuirk({ quirk, text: "test text" });
+    expect(result).toBe("test text"); // Original text should be unchanged
+  });
+});
 
 describe("replace", () => {
   describe("basic character replacement", () => {

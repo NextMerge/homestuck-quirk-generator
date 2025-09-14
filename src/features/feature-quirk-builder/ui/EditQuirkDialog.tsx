@@ -45,6 +45,7 @@ import {
   PlusIcon,
 } from "lucide-react";
 import type { Quirk } from "../utilities/quirk";
+import { isValidRegex } from "../utilities/quirk";
 import { ATTRIBUTE_COUNT_MAX } from "convex/limits";
 
 type QuirkAttribute = Quirk["attributes"][number];
@@ -110,6 +111,24 @@ function AttributeForm({
     updates: Partial<Record<string, string | number | boolean | string[]>>,
   ) => {
     onChange({ ...attribute, ...updates } as QuirkAttribute);
+  };
+
+  // Validation helpers
+  const isMatchPatternInvalid = () => {
+    if (
+      (attribute.type === "regex" || attribute.type === "random") &&
+      attribute.match
+    ) {
+      return !isValidRegex(attribute.match);
+    }
+    return false;
+  };
+
+  const isConditionPatternInvalid = () => {
+    if (attribute.condition) {
+      return !isValidRegex(attribute.condition);
+    }
+    return false;
   };
 
   // Generate descriptive header text based on attribute type and content
@@ -234,7 +253,17 @@ function AttributeForm({
                           updateAttribute({ match: e.target.value })
                         }
                         placeholder="Text to match"
+                        className={
+                          isMatchPatternInvalid()
+                            ? "border-red-500 focus-visible:ring-red-500"
+                            : ""
+                        }
                       />
+                      {isMatchPatternInvalid() && (
+                        <p className="text-sm text-red-600">
+                          Invalid regular expression pattern
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -394,7 +423,17 @@ function AttributeForm({
                         })
                       }
                       placeholder="Optional RegEx condition"
+                      className={
+                        isConditionPatternInvalid()
+                          ? "border-red-500 focus-visible:ring-red-500"
+                          : ""
+                      }
                     />
+                    {isConditionPatternInvalid() && (
+                      <p className="text-sm text-red-600">
+                        Invalid regular expression pattern
+                      </p>
+                    )}
                   </div>
 
                   {/* Probability field */}
