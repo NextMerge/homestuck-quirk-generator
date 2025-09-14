@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
 import {
@@ -427,6 +428,9 @@ function AttributeForm({
 
 export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
   const updateQuirk = useMutation(api.quirks.update);
+  const deleteQuirk = useMutation(api.quirks.remove);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -457,6 +461,14 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
   useEffect(() => {
     form.setFieldValue("attributes", attributes);
   }, [attributes, form]);
+
+  // Reset delete confirmation when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setShowDeleteConfirmation(false);
+      setIsDeleting(false);
+    }
+  }, [open]);
 
   const addAttribute = (type: QuirkAttribute["type"]) => {
     // Prevent adding attributes beyond the limit
@@ -521,6 +533,30 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
       ];
       setAttributes(newAttributes);
     }
+  };
+
+  const handleDelete = async () => {
+    if (!showDeleteConfirmation) {
+      setShowDeleteConfirmation(true);
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteQuirk({ id: quirk.id as Id<"quirks"> });
+      toast.success("Quirk deleted successfully!");
+      onOpenChange(false);
+      setShowDeleteConfirmation(false);
+    } catch (error) {
+      console.error("Failed to delete quirk:", error);
+      toast.error("Failed to delete quirk. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirmation(false);
   };
 
   return (
@@ -733,23 +769,60 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
               </div>
             </div>
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancel
-              </Button>
-              <form.Subscribe
-                selector={(state) => [state.canSubmit, state.isSubmitting]}
-              >
-                {([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                    {isSubmitting ? "Saving..." : "Save Changes"}
+            <DialogFooter className="flex justify-between">
+              <div className="flex gap-2">
+                {!showDeleteConfirmation ? (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                  >
+                    Delete
                   </Button>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? "Deleting..." : "Confirm Delete"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={cancelDelete}
+                      disabled={isDeleting}
+                    >
+                      Cancel Delete
+                    </Button>
+                  </>
                 )}
-              </form.Subscribe>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </Button>
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                >
+                  {([canSubmit, isSubmitting]) => (
+                    <Button
+                      type="submit"
+                      disabled={!canSubmit || isSubmitting || isDeleting}
+                    >
+                      {isSubmitting ? "Saving..." : "Save Changes"}
+                    </Button>
+                  )}
+                </form.Subscribe>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>
