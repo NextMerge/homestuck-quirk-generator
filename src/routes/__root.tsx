@@ -11,14 +11,6 @@ import { Toaster } from "../components/ui/sonner";
 import ClerkProvider from "../integrations/clerk/provider.tsx";
 import ConvexProvider from "../integrations/convex/provider.tsx";
 import appCss from "../styles.css?url";
-import * as Sentry from "@sentry/react";
-
-Sentry.init({
-  dsn: "https://794d8424b96ef74942f929e931f9e405@o4510019787554816.ingest.us.sentry.io/4510019815997440",
-  // Setting this option to true will send default PII data to Sentry.
-  // For example, automatic IP address collection on events
-  sendDefaultPii: true,
-});
 
 export const Route = createRootRoute({
   head: () => ({
