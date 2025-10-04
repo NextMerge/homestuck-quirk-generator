@@ -13,7 +13,7 @@
       "!**/convex/_generated/**/*",
       "**/.vscode/**/*",
       "**/index.html",
-      "**/vite.config.ts",
+      "./*.config.ts",
       "!**/src/routeTree.gen.ts"
     ]
   },
