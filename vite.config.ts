@@ -13,16 +13,22 @@ const config = defineConfig({
       projects: ["./tsconfig.json"],
     }),
     tailwindcss(),
-    tanstackStart({
-      customViteReactPlugin: true,
-    }),
+    tanstackStart(),
     viteReact(),
     sentryVitePlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "nextmerge",
       project: "homestuck-quirks",
+      sourcemaps: {
+        assets: ["./dist/**/*"],
+        ignore: ["**/node_modules/**"],
+        filesToDeleteAfterUpload: ["./dist/**/*.map"],
+      },
     }),
   ],
+  build: {
+    sourcemap: true,
+  },
 });
 
 export default config;

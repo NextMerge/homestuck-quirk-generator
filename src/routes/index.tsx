@@ -57,6 +57,14 @@ function App() {
         />
         <QuirkTable quirks={quirks} pinKey="canon" />
       </main>
+      <button
+        type="button"
+        onClick={() => {
+          throw new Error("Sentry Test Error");
+        }}
+      >
+        Break the world
+      </button>
     </QuirkProvider>
   );
 }
