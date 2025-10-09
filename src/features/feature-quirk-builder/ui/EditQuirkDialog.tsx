@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
+import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
@@ -487,9 +488,21 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
           color: value.color,
           attributes: value.attributes,
         });
+        toast.success("Quirk updated successfully!");
         onOpenChange(false);
       } catch (error) {
         console.error("Failed to update quirk:", error);
+        Sentry.captureException(error, {
+          tags: {
+            action: "updateQuirk",
+          },
+          extra: {
+            quirkId: quirk.id,
+            quirkName: quirk.name,
+            attributeCount: value.attributes.length,
+          },
+        });
+        toast.error("Failed to update quirk. Please try again.");
       }
     },
   });
@@ -588,6 +601,15 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
       setShowDeleteConfirmation(false);
     } catch (error) {
       console.error("Failed to delete quirk:", error);
+      Sentry.captureException(error, {
+        tags: {
+          action: "deleteQuirk",
+        },
+        extra: {
+          quirkId: quirk.id,
+          quirkName: quirk.name,
+        },
+      });
       toast.error("Failed to delete quirk. Please try again.");
     } finally {
       setIsDeleting(false);

@@ -1,6 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
 import { useState } from "react";
+import * as Sentry from "@sentry/react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -76,54 +78,80 @@ export default function CreateQuirkDialog({
       color: "#FFFFFF",
     },
     onSubmit: async ({ value }) => {
-      let quirkData = {
-        name: value.name,
-        description: value.description,
-        color: value.color,
-        attributes: [] as QuirkAttribute[],
-      };
+      try {
+        let quirkData = {
+          name: value.name,
+          description: value.description,
+          color: value.color,
+          attributes: [] as QuirkAttribute[],
+        };
 
-      // Apply preset data if selected
-      if (presetType === "canon" && selectedCanonGroup && selectedCanonQuirk) {
-        const canonQuirks =
-          canonQuirksByGroup[
-            selectedCanonGroup as keyof typeof canonQuirksByGroup
-          ];
-        const canonQuirk = canonQuirks.find((q) => q.id === selectedCanonQuirk);
-        if (canonQuirk) {
-          quirkData = {
-            name: canonQuirk.name,
-            description: canonQuirk.description || "",
-            color: canonQuirk.color,
-            attributes: canonQuirk.attributes,
-          };
+        // Apply preset data if selected
+        if (
+          presetType === "canon" &&
+          selectedCanonGroup &&
+          selectedCanonQuirk
+        ) {
+          const canonQuirks =
+            canonQuirksByGroup[
+              selectedCanonGroup as keyof typeof canonQuirksByGroup
+            ];
+          const canonQuirk = canonQuirks.find(
+            (q) => q.id === selectedCanonQuirk,
+          );
+          if (canonQuirk) {
+            quirkData = {
+              name: canonQuirk.name,
+              description: canonQuirk.description || "",
+              color: canonQuirk.color,
+              attributes: canonQuirk.attributes,
+            };
+          }
+        } else if (presetType === "existing" && selectedExistingQuirk) {
+          const existingQuirk = existingQuirks.find(
+            (q) => q._id === selectedExistingQuirk,
+          );
+          if (existingQuirk) {
+            quirkData = {
+              name: `${existingQuirk.name} Copy`,
+              description: existingQuirk.description || "",
+              color: existingQuirk.color,
+              attributes: existingQuirk.attributes,
+            };
+          }
         }
-      } else if (presetType === "existing" && selectedExistingQuirk) {
-        const existingQuirk = existingQuirks.find(
-          (q) => q._id === selectedExistingQuirk,
-        );
-        if (existingQuirk) {
-          quirkData = {
-            name: `${existingQuirk.name} Copy`,
-            description: existingQuirk.description || "",
-            color: existingQuirk.color,
-            attributes: existingQuirk.attributes,
-          };
-        }
+
+        await createQuirk({
+          collectionId,
+          ...quirkData,
+        });
+
+        toast.success("Quirk created successfully!");
+
+        // Reset form and close dialog
+        form.reset();
+        setPresetType("blank");
+        setSelectedCanonGroup("");
+        setSelectedCanonQuirk("");
+        setSelectedExistingQuirk("");
+        onOpenChange(false);
+      } catch (error) {
+        console.error("Failed to create quirk:", error);
+        Sentry.captureException(error, {
+          tags: {
+            action: "createQuirk",
+            presetType,
+          },
+          extra: {
+            collectionId,
+            presetType,
+            selectedCanonGroup,
+            selectedCanonQuirk,
+            selectedExistingQuirk,
+          },
+        });
+        toast.error("Failed to create quirk. Please try again.");
       }
-
-      await createQuirk({
-        collectionId,
-        ...quirkData,
-      });
-
-      // Reset form and close dialog
-      form.reset();
-      setPresetType("blank");
-      setSelectedCanonGroup("");
-      setSelectedCanonQuirk("");
-      setSelectedExistingQuirk("");
-      onOpenChange(false);
     },
   });
 
