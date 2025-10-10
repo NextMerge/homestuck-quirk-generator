@@ -1,10 +1,25 @@
-import { useState, useEffect } from "react";
-import { useForm } from "@tanstack/react-form";
-import { useMutation } from "convex/react";
 import * as Sentry from "@sentry/react";
-import { toast } from "sonner";
+import { useForm } from "@tanstack/react-form";
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import { ATTRIBUTE_COUNT_MAX } from "convex/limits";
+import { useMutation } from "convex/react";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  HelpCircleIcon,
+  PlusIcon,
+  Trash2Icon,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,41 +28,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  Trash2Icon,
-  ChevronUpIcon,
-  ChevronDownIcon,
-  HelpCircleIcon,
-  PlusIcon,
-} from "lucide-react";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Quirk } from "../utilities/quirk";
 import { isValidRegex } from "../utilities/quirk";
-import { ATTRIBUTE_COUNT_MAX } from "convex/limits";
 
 type QuirkAttribute = Quirk["attributes"][number];
 
@@ -499,7 +498,7 @@ export function EditQuirkDialog({ quirk, open, onOpenChange }: Props) {
           extra: {
             quirkId: quirk.id,
             quirkName: quirk.name,
-            attributeCount: value.attributes.length,
+            attributes: JSON.stringify(value.attributes),
           },
         });
         toast.error("Failed to update quirk. Please try again.");
