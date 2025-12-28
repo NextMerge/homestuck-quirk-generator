@@ -5,7 +5,6 @@ import { Button } from "./ui/button";
 
 export default function Header() {
   const location = useLocation();
-  const isIndexPage = location.pathname === "/";
   const { user } = useUser();
 
   return (
@@ -35,18 +34,6 @@ export default function Header() {
             )}
           </Authenticated>
         </nav>
-
-        {/* Index page notice */}
-        {isIndexPage && (
-          <div className="hidden md:block text-center flex-1 mx-8">
-            <Unauthenticated>
-              <p className="text-gray-300 text-sm">
-                You can now build your own quirks! Better a decade late than
-                never! Sign in to start.
-              </p>
-            </Unauthenticated>
-          </div>
-        )}
 
         <div className="flex items-center">
           <Authenticated>
